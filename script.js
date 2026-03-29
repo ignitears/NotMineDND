@@ -1,9 +1,42 @@
 let current = { hp: 100, sta: 100, mana: 100 };
+const inputList = ['global-d20', 'in-str', 'in-spd', 'in-con', 'in-end', 'in-dex', 'in-for', 'in-acc', 'in-cas', 'in-ctr', 'in-msu'];
+
+function saveData() {
+    const saveState = { currentVars: current, inputs: {} };
+    inputList.forEach(id => {
+        saveState.inputs[id] = document.getElementById(id).value;
+    });
+    localStorage.setItem('skillLevelUpSave', JSON.stringify(saveState));
+}
+
+function loadData() {
+    const saved = localStorage.getItem('skillLevelUpSave');
+    if (saved) {
+        const parsed = JSON.parse(saved);
+        current = parsed.currentVars || current;
+        inputList.forEach(id => {
+            if (parsed.inputs[id] !== undefined) {
+                document.getElementById(id).value = parsed.inputs[id];
+            }
+        });
+    }
+    runEngine(); 
+}
+
+function wipeSave() {
+    if(confirm("Wipe this character profile?")) {
+        localStorage.removeItem('skillLevelUpSave');
+        current = { hp: 100, sta: 100, mana: 100 };
+        inputList.forEach(id => document.getElementById(id).value = id === 'global-d20' ? '10' : '0');
+        runEngine();
+    }
+}
 
 function mod(type, val) {
     const max = parseFloat(document.getElementById(`max-${type}`).innerText);
     current[type] = Math.max(0, Math.min(max, current[type] + val));
     updateBars();
+    saveData();
 }
 
 function manualEdit(type) {
@@ -11,13 +44,13 @@ function manualEdit(type) {
     const max = parseFloat(document.getElementById(`max-${type}`).innerText);
     current[type] = Math.max(0, Math.min(max, typedVal));
     updateBars();
+    saveData();
 }
 
 function runEngine() {
     const v = (id) => parseFloat(document.getElementById(id).value) || 0;
     const d20 = v('global-d20');
 
-    // Max Tanks (Decimals retained)
     const maxHP = 100 * ((0.5 * v('in-con')) + 1);
     const maxSTA = 100 * ((0.2 * v('in-end')) + 1);
     const maxMAN = 100 * ((0.2 * v('in-msu')) + 1);
@@ -26,13 +59,11 @@ function runEngine() {
     document.getElementById('max-sta').innerText = maxSTA.toFixed(1);
     document.getElementById('max-mana').innerText = maxMAN.toFixed(1);
 
-    // Physicals
     document.getElementById('out-melee').innerText = (-5 * ((0.5 * v('in-str')) + 1)).toFixed(1);
     document.getElementById('out-lift').innerText = (50 + (5 * v('in-str'))).toFixed(1) + "kg";
     document.getElementById('out-move').innerText = (10 * ((0.2 * v('in-spd')) + 1)).toFixed(1) + "m";
 
-    // Combat & Forecast
-    const act = 1 + Math.floor(v('in-dex') / 20); // Kept as whole number because actions can't be split
+    const act = 1 + Math.floor(v('in-dex') / 20);
     const extra = 10 * ((0.05 * v('in-for')) + 1) * d20;
     const dodge = (10 * ((0.1 * v('in-dex')) + 1) * d20) + extra;
     const hit = (10 * ((0.1 * v('in-acc')) + 1) * d20) + extra;
@@ -41,13 +72,13 @@ function runEngine() {
     document.getElementById('out-dodge').innerText = dodge.toFixed(1);
     document.getElementById('out-hit').innerText = hit.toFixed(1);
 
-    // Magic
     document.getElementById('out-mag').innerText = (-5 * ((0.5 * v('in-cas')) + 1)).toFixed(1);
     document.getElementById('out-mcon').innerText = (100 - v('in-ctr')).toFixed(1) + "%";
 
     updateTiers(v('in-cas'));
     updateUnlockText(v('in-for'), v('in-dex'), v('in-cas'));
     updateBars();
+    saveData();
 }
 
 function updateTiers(cas) {
@@ -82,4 +113,4 @@ function updateBars() {
     });
 }
 
-document.addEventListener("DOMContentLoaded", runEngine);
+document.addEventListener("DOMContentLoaded", loadData);
