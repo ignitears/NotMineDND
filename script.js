@@ -1,45 +1,49 @@
 let current = { hp: 100, sta: 100, mana: 100 };
 
 function mod(type, val) {
-    const max = parseInt(document.getElementById(`max-${type}`).innerText);
+    const max = parseFloat(document.getElementById(`max-${type}`).innerText);
     current[type] = Math.max(0, Math.min(max, current[type] + val));
     updateBars();
 }
 
 function manualEdit(type) {
-    let typedVal = parseInt(document.getElementById(`cur-${type}`).value) || 0;
-    const max = parseInt(document.getElementById(`max-${type}`).innerText);
+    let typedVal = parseFloat(document.getElementById(`cur-${type}`).value) || 0;
+    const max = parseFloat(document.getElementById(`max-${type}`).innerText);
     current[type] = Math.max(0, Math.min(max, typedVal));
     updateBars();
 }
 
 function runEngine() {
-    const v = (id) => parseInt(document.getElementById(id).value) || 0;
+    const v = (id) => parseFloat(document.getElementById(id).value) || 0;
     const d20 = v('global-d20');
 
+    // Max Tanks (Decimals retained)
     const maxHP = 100 * ((0.5 * v('in-con')) + 1);
     const maxSTA = 100 * ((0.2 * v('in-end')) + 1);
     const maxMAN = 100 * ((0.2 * v('in-msu')) + 1);
     
-    document.getElementById('max-hp').innerText = Math.floor(maxHP);
-    document.getElementById('max-sta').innerText = Math.floor(maxSTA);
-    document.getElementById('max-mana').innerText = Math.floor(maxMAN);
+    document.getElementById('max-hp').innerText = maxHP.toFixed(1);
+    document.getElementById('max-sta').innerText = maxSTA.toFixed(1);
+    document.getElementById('max-mana').innerText = maxMAN.toFixed(1);
 
+    // Physicals
     document.getElementById('out-melee').innerText = (-5 * ((0.5 * v('in-str')) + 1)).toFixed(1);
-    document.getElementById('out-lift').innerText = (50 + (5 * v('in-str'))) + "kg";
+    document.getElementById('out-lift').innerText = (50 + (5 * v('in-str'))).toFixed(1) + "kg";
     document.getElementById('out-move').innerText = (10 * ((0.2 * v('in-spd')) + 1)).toFixed(1) + "m";
 
-    const act = 1 + Math.floor(v('in-dex') / 20);
+    // Combat & Forecast
+    const act = 1 + Math.floor(v('in-dex') / 20); // Kept as whole number because actions can't be split
     const extra = 10 * ((0.05 * v('in-for')) + 1) * d20;
     const dodge = (10 * ((0.1 * v('in-dex')) + 1) * d20) + extra;
     const hit = (10 * ((0.1 * v('in-acc')) + 1) * d20) + extra;
 
     document.getElementById('out-act').innerText = act;
-    document.getElementById('out-dodge').innerText = Math.floor(dodge);
-    document.getElementById('out-hit').innerText = Math.floor(hit);
+    document.getElementById('out-dodge').innerText = dodge.toFixed(1);
+    document.getElementById('out-hit').innerText = hit.toFixed(1);
 
+    // Magic
     document.getElementById('out-mag').innerText = (-5 * ((0.5 * v('in-cas')) + 1)).toFixed(1);
-    document.getElementById('out-mcon').innerText = (100 - v('in-ctr')) + "%";
+    document.getElementById('out-mcon').innerText = (100 - v('in-ctr')).toFixed(1) + "%";
 
     updateTiers(v('in-cas'));
     updateUnlockText(v('in-for'), v('in-dex'), v('in-cas'));
@@ -71,12 +75,11 @@ function updateUnlockText(f, d, c) {
 
 function updateBars() {
     ['hp', 'sta', 'mana'].forEach(t => {
-        const max = parseInt(document.getElementById(`max-${t}`).innerText);
+        const max = parseFloat(document.getElementById(`max-${t}`).innerText);
         if(current[t] > max) current[t] = max;
-        document.getElementById(`cur-${t}`).value = Math.floor(current[t]);
+        document.getElementById(`cur-${t}`).value = current[t].toFixed(1);
         document.getElementById(`bar-${t}`).style.width = (current[t] / max * 100) + "%";
     });
 }
 
-// Run once on load to initialize
 document.addEventListener("DOMContentLoaded", runEngine);
