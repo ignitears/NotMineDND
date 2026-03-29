@@ -16,7 +16,7 @@
             </div>
             <div class="mt-4 md:mt-0 bg-slate-900 p-3 rounded-lg border border-slate-700 text-right">
                 <label class="label-sub block mb-1 text-sky-400">Current d20 Roll</label>
-                <input type="number" id="global-d20" value="10" min="1" max="20" class="stat-input text-center w-24 font-bold text-lg" oninput="runEngine()">
+                <input type="number" id="global-d20" value="10" min="1" max="20" step="any" class="stat-input text-center w-24 font-bold text-lg" oninput="runEngine()">
             </div>
         </div>
 
@@ -30,9 +30,9 @@
                     </div>
                 </div>
                 <div class="text-2xl font-mono flex items-center gap-2">
-                    <input type="number" id="cur-hp" class="cur-input text-red-400" onchange="manualEdit('hp')"> 
+                    <input type="number" id="cur-hp" step="any" class="cur-input text-red-400" onchange="manualEdit('hp')"> 
                     <span class="text-slate-500">/</span> 
-                    <span id="max-hp">100</span>
+                    <span id="max-hp">100.0</span>
                 </div>
                 <div class="progress-bg"><div id="bar-hp" class="progress-fill bg-red-500" style="width: 100%"></div></div>
             </div>
@@ -45,9 +45,9 @@
                     </div>
                 </div>
                 <div class="text-2xl font-mono flex items-center gap-2">
-                    <input type="number" id="cur-sta" class="cur-input text-yellow-400" onchange="manualEdit('sta')"> 
+                    <input type="number" id="cur-sta" step="any" class="cur-input text-yellow-400" onchange="manualEdit('sta')"> 
                     <span class="text-slate-500">/</span> 
-                    <span id="max-sta">100</span>
+                    <span id="max-sta">100.0</span>
                 </div>
                 <div class="progress-bg"><div id="bar-sta" class="progress-fill bg-yellow-500" style="width: 100%"></div></div>
             </div>
@@ -60,9 +60,9 @@
                     </div>
                 </div>
                 <div class="text-2xl font-mono flex items-center gap-2">
-                    <input type="number" id="cur-mana" class="cur-input text-blue-400" onchange="manualEdit('mana')"> 
+                    <input type="number" id="cur-mana" step="any" class="cur-input text-blue-400" onchange="manualEdit('mana')"> 
                     <span class="text-slate-500">/</span> 
-                    <span id="max-mana">100</span>
+                    <span id="max-mana">100.0</span>
                 </div>
                 <div class="progress-bg"><div id="bar-mana" class="progress-fill bg-blue-500" style="width: 100%"></div></div>
             </div>
@@ -73,16 +73,16 @@
                 <div class="stat-card">
                     <h2 class="text-sm font-bold mb-4 text-slate-400 border-b border-slate-700 pb-2 uppercase">Skill Points</h2>
                     <div class="space-y-3">
-                        <div><label class="label-sub">Strength</label><input type="number" id="in-str" value="0" class="stat-input" oninput="runEngine()"></div>
-                        <div><label class="label-sub">Speed</label><input type="number" id="in-spd" value="0" class="stat-input" oninput="runEngine()"></div>
-                        <div><label class="label-sub">Constitution</label><input type="number" id="in-con" value="0" class="stat-input" oninput="runEngine()"></div>
-                        <div><label class="label-sub">Endurance</label><input type="number" id="in-end" value="0" class="stat-input" oninput="runEngine()"></div>
-                        <div><label class="label-sub">Dexterity</label><input type="number" id="in-dex" value="0" class="stat-input" oninput="runEngine()"></div>
-                        <div><label class="label-sub">Forecast</label><input type="number" id="in-for" value="0" class="stat-input" oninput="runEngine()"></div>
-                        <div><label class="label-sub">Accuracy</label><input type="number" id="in-acc" value="0" class="stat-input" oninput="runEngine()"></div>
-                        <div><label class="label-sub">Casting</label><input type="number" id="in-cas" value="0" class="stat-input" oninput="runEngine()"></div>
-                        <div><label class="label-sub">Control</label><input type="number" id="in-ctr" value="0" class="stat-input" oninput="runEngine()"></div>
-                        <div><label class="label-sub">Mana Supply</label><input type="number" id="in-msu" value="0" class="stat-input" oninput="runEngine()"></div>
+                        <div><label class="label-sub">Strength</label><input type="number" id="in-str" value="0" step="any" class="stat-input" oninput="runEngine()"></div>
+                        <div><label class="label-sub">Speed</label><input type="number" id="in-spd" value="0" step="any" class="stat-input" oninput="runEngine()"></div>
+                        <div><label class="label-sub">Constitution</label><input type="number" id="in-con" value="0" step="any" class="stat-input" oninput="runEngine()"></div>
+                        <div><label class="label-sub">Endurance</label><input type="number" id="in-end" value="0" step="any" class="stat-input" oninput="runEngine()"></div>
+                        <div><label class="label-sub">Dexterity</label><input type="number" id="in-dex" value="0" step="any" class="stat-input" oninput="runEngine()"></div>
+                        <div><label class="label-sub">Forecast</label><input type="number" id="in-for" value="0" step="any" class="stat-input" oninput="runEngine()"></div>
+                        <div><label class="label-sub">Accuracy</label><input type="number" id="in-acc" value="0" step="any" class="stat-input" oninput="runEngine()"></div>
+                        <div><label class="label-sub">Casting</label><input type="number" id="in-cas" value="0" step="any" class="stat-input" oninput="runEngine()"></div>
+                        <div><label class="label-sub">Control</label><input type="number" id="in-ctr" value="0" step="any" class="stat-input" oninput="runEngine()"></div>
+                        <div><label class="label-sub">Mana Supply</label><input type="number" id="in-msu" value="0" step="any" class="stat-input" oninput="runEngine()"></div>
                     </div>
                 </div>
             </div>
@@ -93,18 +93,18 @@
                         <h3 class="text-sky-400 font-bold text-sm mb-3 uppercase">Physical & Combat</h3>
                         <div class="space-y-2 text-sm font-mono">
                             <div class="flex justify-between"><span>Melee Damage:</span> <span id="out-melee" class="text-white">-5.0</span></div>
-                            <div class="flex justify-between"><span>Lifting Capacity:</span> <span id="out-lift" class="text-white">50kg</span></div>
-                            <div class="flex justify-between"><span>Move Distance:</span> <span id="out-move" class="text-white">10m</span></div>
+                            <div class="flex justify-between"><span>Lifting Capacity:</span> <span id="out-lift" class="text-white">50.0kg</span></div>
+                            <div class="flex justify-between"><span>Move Distance:</span> <span id="out-move" class="text-white">10.0m</span></div>
                             <div class="flex justify-between"><span>Total Actions:</span> <span id="out-act" class="text-white">1</span></div>
-                            <div class="flex justify-between border-t border-slate-700 pt-2"><span>Dodge Result:</span> <span id="out-dodge" class="text-orange-400">0</span></div>
-                            <div class="flex justify-between"><span>Hit Result:</span> <span id="out-hit" class="text-orange-400">0</span></div>
+                            <div class="flex justify-between border-t border-slate-700 pt-2"><span>Dodge Result:</span> <span id="out-dodge" class="text-orange-400">0.0</span></div>
+                            <div class="flex justify-between"><span>Hit Result:</span> <span id="out-hit" class="text-orange-400">0.0</span></div>
                         </div>
                     </div>
                     <div class="stat-card">
                         <h3 class="text-purple-400 font-bold text-sm mb-3 uppercase">Magic & Mana</h3>
                         <div class="space-y-2 text-sm font-mono">
                             <div class="flex justify-between"><span>Magic Damage:</span> <span id="out-mag" class="text-white">-5.0</span></div>
-                            <div class="flex justify-between"><span>Mana Consumption:</span> <span id="out-mcon" class="text-white">100%</span></div>
+                            <div class="flex justify-between"><span>Mana Consumption:</span> <span id="out-mcon" class="text-white">100.0%</span></div>
                             <div class="mt-4 p-2 bg-slate-900 rounded border border-slate-700 text-[10px]">
                                 <span class="text-purple-300 block mb-1">SUCCESS THRESHOLDS (ROLL > X)</span>
                                 <div id="out-tiers" class="grid grid-cols-2 gap-x-4"></div>
