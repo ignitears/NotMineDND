@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skill Level Up v1.0 - Complete Engine</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+<body class="bg-slate-950 text-slate-200 p-4 font-sans">
+    <div class="max-w-6xl mx-auto">
+        <div class="flex flex-col md:flex-row justify-between items-center mb-6 border-b border-slate-800 pb-4">
+            <div>
+                <h1 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-blue-600">SKILL LEVEL UP v1.0</h1>
+            </div>
+            <div class="mt-4 md:mt-0 bg-slate-900 p-3 rounded-lg border border-slate-700 text-right">
+                <label class="label-sub block mb-1 text-sky-400">Current d20 Roll</label>
+                <input type="number" id="global-d20" value="10" min="1" max="20" class="stat-input text-center w-24 font-bold text-lg" oninput="runEngine()">
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="stat-card border-t-4 border-red-500">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="label-sub text-red-400">Constitution / HP</span>
+                    <div class="flex gap-1">
+                        <button class="btn-ctrl" onclick="mod('hp', -10)">-10</button>
+                        <button class="btn-ctrl" onclick="mod('hp', 10)">+10</button>
+                    </div>
+                </div>
+                <div class="text-2xl font-mono flex items-center gap-2">
+                    <input type="number" id="cur-hp" class="cur-input text-red-400" onchange="manualEdit('hp')"> 
+                    <span class="text-slate-500">/</span> 
+                    <span id="max-hp">100</span>
+                </div>
+                <div class="progress-bg"><div id="bar-hp" class="progress-fill bg-red-500" style="width: 100%"></div></div>
+            </div>
+            <div class="stat-card border-t-4 border-yellow-500">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="label-sub text-yellow-400">Endurance / Stamina</span>
+                    <div class="flex gap-1">
+                        <button class="btn-ctrl" onclick="mod('sta', -5)">Act</button>
+                        <button class="btn-ctrl" onclick="mod('sta', 30)">Rest</button>
+                    </div>
+                </div>
+                <div class="text-2xl font-mono flex items-center gap-2">
+                    <input type="number" id="cur-sta" class="cur-input text-yellow-400" onchange="manualEdit('sta')"> 
+                    <span class="text-slate-500">/</span> 
+                    <span id="max-sta">100</span>
+                </div>
+                <div class="progress-bg"><div id="bar-sta" class="progress-fill bg-yellow-500" style="width: 100%"></div></div>
+            </div>
+            <div class="stat-card border-t-4 border-blue-500">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="label-sub text-blue-400">Mana Supply / Tank</span>
+                    <div class="flex gap-1">
+                        <button class="btn-ctrl" onclick="mod('mana', -20)">Spell</button>
+                        <button class="btn-ctrl" onclick="mod('mana', 30)">Rest</button>
+                    </div>
+                </div>
+                <div class="text-2xl font-mono flex items-center gap-2">
+                    <input type="number" id="cur-mana" class="cur-input text-blue-400" onchange="manualEdit('mana')"> 
+                    <span class="text-slate-500">/</span> 
+                    <span id="max-mana">100</span>
+                </div>
+                <div class="progress-bg"><div id="bar-mana" class="progress-fill bg-blue-500" style="width: 100%"></div></div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <div class="lg:col-span-1 space-y-4">
+                <div class="stat-card">
+                    <h2 class="text-sm font-bold mb-4 text-slate-400 border-b border-slate-700 pb-2 uppercase">Skill Points</h2>
+                    <div class="space-y-3">
+                        <div><label class="label-sub">Strength</label><input type="number" id="in-str" value="0" class="stat-input" oninput="runEngine()"></div>
+                        <div><label class="label-sub">Speed</label><input type="number" id="in-spd" value="0" class="stat-input" oninput="runEngine()"></div>
+                        <div><label class="label-sub">Constitution</label><input type="number" id="in-con" value="0" class="stat-input" oninput="runEngine()"></div>
+                        <div><label class="label-sub">Endurance</label><input type="number" id="in-end" value="0" class="stat-input" oninput="runEngine()"></div>
+                        <div><label class="label-sub">Dexterity</label><input type="number" id="in-dex" value="0" class="stat-input" oninput="runEngine()"></div>
+                        <div><label class="label-sub">Forecast</label><input type="number" id="in-for" value="0" class="stat-input" oninput="runEngine()"></div>
+                        <div><label class="label-sub">Accuracy</label><input type="number" id="in-acc" value="0" class="stat-input" oninput="runEngine()"></div>
+                        <div><label class="label-sub">Casting</label><input type="number" id="in-cas" value="0" class="stat-input" oninput="runEngine()"></div>
+                        <div><label class="label-sub">Control</label><input type="number" id="in-ctr" value="0" class="stat-input" oninput="runEngine()"></div>
+                        <div><label class="label-sub">Mana Supply</label><input type="number" id="in-msu" value="0" class="stat-input" oninput="runEngine()"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-3 space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="stat-card">
+                        <h3 class="text-sky-400 font-bold text-sm mb-3 uppercase">Physical & Combat</h3>
+                        <div class="space-y-2 text-sm font-mono">
+                            <div class="flex justify-between"><span>Melee Damage:</span> <span id="out-melee" class="text-white">-5.0</span></div>
+                            <div class="flex justify-between"><span>Lifting Capacity:</span> <span id="out-lift" class="text-white">50kg</span></div>
+                            <div class="flex justify-between"><span>Move Distance:</span> <span id="out-move" class="text-white">10m</span></div>
+                            <div class="flex justify-between"><span>Total Actions:</span> <span id="out-act" class="text-white">1</span></div>
+                            <div class="flex justify-between border-t border-slate-700 pt-2"><span>Dodge Result:</span> <span id="out-dodge" class="text-orange-400">0</span></div>
+                            <div class="flex justify-between"><span>Hit Result:</span> <span id="out-hit" class="text-orange-400">0</span></div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <h3 class="text-purple-400 font-bold text-sm mb-3 uppercase">Magic & Mana</h3>
+                        <div class="space-y-2 text-sm font-mono">
+                            <div class="flex justify-between"><span>Magic Damage:</span> <span id="out-mag" class="text-white">-5.0</span></div>
+                            <div class="flex justify-between"><span>Mana Consumption:</span> <span id="out-mcon" class="text-white">100%</span></div>
+                            <div class="mt-4 p-2 bg-slate-900 rounded border border-slate-700 text-[10px]">
+                                <span class="text-purple-300 block mb-1">SUCCESS THRESHOLDS (ROLL > X)</span>
+                                <div id="out-tiers" class="grid grid-cols-2 gap-x-4"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <h3 class="text-emerald-400 font-bold text-sm mb-3 uppercase">Ability Unlocks</h3>
+                    <div id="out-unlocks" class="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

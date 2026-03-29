@@ -1,0 +1,9 @@
+.stat-input { background: #0f172a; border: 1px solid #334155; color: #f1f5f9; padding: 4px; border-radius: 4px; width: 100%; }
+.stat-card { background: #1e293b; border: 1px solid #334155; padding: 1rem; border-radius: 0.75rem; }
+.label-sub { font-size: 0.65rem; color: #94a3b8; font-weight: bold; text-transform: uppercase; }
+.btn-ctrl { background: #334155; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; transition: 0.2s; }
+.btn-ctrl:hover { background: #475569; }
+.cur-input { background: transparent; border-bottom: 2px solid #475569; text-align: center; width: 80px; font-weight: bold; outline: none; }
+.cur-input:focus { border-color: #38bdf8; }
+.progress-bg { height: 6px; background: #0f172a; border-radius: 4px; overflow: hidden; margin-top: 8px; }
+.progress-fill { height: 100%; transition: width 0.3s ease; }
