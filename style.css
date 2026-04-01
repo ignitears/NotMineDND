@@ -328,3 +328,23 @@ hr { border: 0; height: 2px; background: var(--border-main); margin: 30px 0; }
     border: 1px solid var(--color-blue);
     box-shadow: 0 0 8px rgba(46, 181, 187, 0.2);
 }
+.io-btn:hover {
+    background: var(--bg-input);
+    color: var(--text-main);
+    border: 1px solid var(--color-blue);
+    box-shadow: 0 0 8px rgba(46, 181, 187, 0.2);
+}
+
+/* --- Fix Header Collision on Small Screens --- */
+.header-container h2 {
+    padding: 0 120px; 
+    text-align: center;
+    line-height: 1.4;
+}
+
+@media(max-width: 600px) {
+    .header-container h2 {
+        font-size: 22px; 
+        padding: 0 100px;
+    }
+}
