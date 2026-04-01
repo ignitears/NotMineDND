@@ -1,5 +1,5 @@
 let currentInventory = [];
-let currentCharacter = null; // Tracks the currently loaded character
+let currentCharacter = null; 
 
 window.onload = function() {
     const savedTheme = localStorage.getItem('theme');
@@ -161,7 +161,6 @@ function calculateAll() {
         <p><strong>Base Carry Cap:</strong> 50 + (${str} * 5) = ${carryCap}kg</p>
     `;
 
-    // Trigger auto-save whenever stats change
     autoSave();
 }
 
@@ -177,7 +176,6 @@ function addInventoryItem() {
 
     if (!name) return showToast("Please enter an item name!");
 
-    // Check if item already exists (same name and weight)
     const existingItem = currentInventory.find(item => 
         item.name.toLowerCase() === name.toLowerCase() && item.weight === weight
     );
@@ -255,10 +253,8 @@ function renderInventory() {
 }
 
 /* --- Character Management Logic --- */
-
-// The new Auto-Save function
 function autoSave() {
-    if (!currentCharacter) return; // Don't save if no character is currently selected
+    if (!currentCharacter) return; 
     
     const charData = { stats: {}, inventory: currentInventory };
     document.querySelectorAll('.dashboard input[type="number"]').forEach(input => {
@@ -285,7 +281,7 @@ function saveCharacter() {
     const name = nameInput.value.trim();
     if (!name) return showToast("Please enter a character name!");
 
-    currentCharacter = name; // Mark this character as the currently active one
+    currentCharacter = name;
     autoSave();
     
     nameInput.value = '';
@@ -316,9 +312,8 @@ function loadCharacter(name) {
     const characters = JSON.parse(localStorage.getItem('dnd_characters') || '{}');
     if (!characters[name]) return;
 
-    currentCharacter = name; // Set loaded character as active for auto-saving
+    currentCharacter = name; 
 
-    // Support legacy saves without inventory
     const charData = characters[name].stats ? characters[name].stats : characters[name];
     
     for (const id in charData) {
@@ -356,7 +351,6 @@ function confirmDelete() {
     delete characters[charToDelete];
     localStorage.setItem('dnd_characters', JSON.stringify(characters));
     
-    // Clear active character if it was the one deleted
     if (currentCharacter === charToDelete) {
         currentCharacter = null;
     }
@@ -376,12 +370,10 @@ function longRest() {
     const newStamina = (100 * ((0.2 * end) + 1)).toFixed(0);
     const newMana = (100 * ((0.2 * manaSup) + 1)).toFixed(0);
 
-    // Update the visual inputs
     document.getElementById('current-hp').value = newHp;
     document.getElementById('current-stamina').value = newStamina;
     document.getElementById('current-mana').value = newMana;
     
-    // Force update the browser's temporary storage so it survives a refresh
     localStorage.setItem('current-hp', newHp);
     localStorage.setItem('current-stamina', newStamina);
     localStorage.setItem('current-mana', newMana);
@@ -418,5 +410,29 @@ function importData(event) {
         }
     };
     reader.readAsText(file);
-    event.target.value = ''; // Reset input so you can import the same file again if needed
+    event.target.value = ''; 
+}
+/* --- Clear Cache Logic --- */
+function clearCache() {
+    document.getElementById('clear-cache-modal').classList.remove('hidden');
+}
+
+function closeClearCacheModal() {
+    document.getElementById('clear-cache-modal').classList.add('hidden');
+}
+
+function confirmClearCache() {
+    // 1. Save the important data first
+    const savedCharacters = localStorage.getItem('dnd_characters');
+    const savedTheme = localStorage.getItem('theme');
+
+    // 2. Wipe the browser's temporary storage (the current inputs)
+    localStorage.clear();
+
+    // 3. Put the important data back safely
+    if (savedCharacters) localStorage.setItem('dnd_characters', savedCharacters);
+    if (savedTheme) localStorage.setItem('theme', savedTheme);
+
+    // 4. Refresh to show the clean board
+    location.reload(); 
 }

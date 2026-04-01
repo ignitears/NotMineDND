@@ -49,7 +49,7 @@ body {
     transition: background-color 0.3s, color 0.3s;
 }
 
-/* Header & Theme Toggle */
+/* Header */
 .header-container {
     display: flex;
     justify-content: center;
@@ -58,22 +58,10 @@ body {
     max-width: 1100px;
     margin: 0 auto 30px auto;
 }
-
-h2 { color: var(--color-blue); font-size: 28px; text-transform: uppercase; letter-spacing: 1px; }
-
-.theme-btn {
-    position: absolute;
-    right: 0;
-    background: transparent;
-    color: var(--text-muted);
-    border: 1px solid var(--border-main);
-    padding: 6px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: 0.2s;
+.header-container h2 {
+    color: var(--color-blue); font-size: 28px; text-transform: uppercase; letter-spacing: 1px;
+    text-align: center; white-space: nowrap; z-index: 1;
 }
-.theme-btn:hover { background: var(--bg-panel); color: var(--text-main); }
 
 h3 { color: var(--color-blue); margin-bottom: 20px; border-bottom: 2px solid var(--border-main); padding-bottom: 10px; text-transform: uppercase;}
 hr { border: 0; height: 2px; background: var(--border-main); margin: 30px 0; }
@@ -270,11 +258,13 @@ hr { border: 0; height: 2px; background: var(--border-main); margin: 30px 0; }
 .pack-btn:hover { background: var(--color-blue); color: white; border-color: var(--color-blue); }
 .pack-btn.overweight { color: var(--color-red); border-color: var(--color-red); background: rgba(204, 75, 85, 0.1); }
 
-/* Mobile formatting to make the button a large, tappable block */
+/* Mobile formatting */
 @media(max-width: 600px) {
+    .header-container h2 { font-size: 18px; }
     .sticky-results h3 { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
     .pack-btn { width: 100%; margin-left: 0; padding: 12px; font-size: 16px; }
 }
+
 .split-inputs { display: flex; gap: 10px; }
 .split-inputs input { width: 50%; }
 
@@ -298,6 +288,7 @@ hr { border: 0; height: 2px; background: var(--border-main); margin: 30px 0; }
     cursor: pointer; font-weight: bold; transition: 0.2s; 
 }
 .qty-btn:hover { background: var(--color-blue); color: white; border-color: var(--color-blue); }
+
 /* --- Import/Export Utility Buttons --- */
 .io-actions { 
     display: flex; 
@@ -328,30 +319,9 @@ hr { border: 0; height: 2px; background: var(--border-main); margin: 30px 0; }
     border: 1px solid var(--color-blue);
     box-shadow: 0 0 8px rgba(46, 181, 187, 0.2);
 }
-.io-btn:hover {
-    background: var(--bg-input);
-    color: var(--text-main);
-    border: 1px solid var(--color-blue);
-    box-shadow: 0 0 8px rgba(46, 181, 187, 0.2);
-}
 
-/* --- Keep Header Strictly on One Line --- */
-.header-container h2 {
-    white-space: nowrap; /* Forces the title to never break into two lines */
-    z-index: 1; /* Keeps the title visible if things get super tight */
-}
-
-/* On mobile screens, gently shrink the text so it all fits on one line */
-@media(max-width: 600px) {
-    .header-container h2 {
-        font-size: 18px; 
-    }
-    .theme-btn {
-        font-size: 12px; 
-        padding: 6px 8px;
-    }
-    .menu-btn {
-        font-size: 16px;
-        padding: 4px 8px;
-    }
+.sidebar-footer {
+    margin-top: auto; /* Pushes the buttons to the very bottom of the sidebar */
+    padding-top: 20px;
+    border-top: 1px solid var(--border-input);
 }
