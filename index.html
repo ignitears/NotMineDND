@@ -3,15 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skill Level Up - D&D Calculator</title>
+    <title>RPG Console</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h2>⚔️ Skill Level Up Dashboard</h2>
+    <div class="header-container">
+        <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+        <h2>⚔️ RPG Console⚔️</h2>
+        <button id="theme-toggle" class="theme-btn" onclick="toggleTheme()">☀️ Light Mode</button>
+    </div>
+
+    <div id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <h3>Characters</h3>
+            <button class="close-btn" onclick="toggleSidebar()">✖</button>
+        </div>
+        <div class="sidebar-inputs">
+            <input type="text" id="char-name-input" placeholder="Character Name">
+            <button class="save-btn" onclick="saveCharacter()">Save</button>
+            <div class="io-actions">
+                <button class="io-btn" onclick="exportData()">📥 Export</button>
+                <button class="io-btn" onclick="document.getElementById('import-file').click()">📤 Import</button>
+                <input type="file" id="import-file" style="display:none" accept=".json" onchange="importData(event)">
+            </div>
+        </div>
+        <div id="char-cards-container"></div>
+    </div>
+
+    <div id="inventory-sidebar" class="sidebar right-sidebar">
+        <div class="sidebar-header">
+            <h3>Backpack</h3>
+            <button class="close-btn" onclick="toggleInventory()">✖</button>
+        </div>
+        <div class="sidebar-inputs">
+            <input type="text" id="item-name" placeholder="Item Name (e.g., Iron Sword)">
+            <div class="split-inputs">
+                <input type="number" id="item-weight" placeholder="Weight (kg)">
+                <input type="number" id="item-qty" placeholder="Qty" value="1">
+            </div>
+            <button class="save-btn" onclick="addInventoryItem()">Add Item</button>
+        </div>
+        <hr>
+        <div id="inventory-list" class="inventory-list"></div>
+    </div>
     
     <div class="dashboard">
         <div class="left-panel">
-            
+            <div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
+                <button class="pack-btn" onclick="longRest()">🏕️ Long Rest</button>
+            </div>
             <div class="tracker-box fancy-trackers">
                 <div class="tracker-row hp-row">
                     <label>HP:</label>
@@ -48,11 +88,11 @@
                     <label>Spell Base Power:</label>
                     <input type="number" class="large-input" id="spell-base" value="10">
                 </div>
-                <div class="big-input-group dice-group">
+                <div class="big-input-group">
                     <label>d20 Roll:</label>
                     <div class="dice-wrapper">
                         <input type="number" class="large-input" id="d20-roll" value="10">
-                        <button class="dice-btn" onclick="rollDice()">🎲</button>
+                        <button class="dice-btn" id="dice-button" onclick="rollDice()">🎲</button>
                     </div>
                 </div>
             </div>
@@ -74,13 +114,16 @@
                 <div class="input-row"><label>Mana Supply:</label> <input type="number" id="mana-supply" value="0"></div>
                 <div class="input-row"><label>Sensing:</label> <input type="number" id="sensing" value="0"></div>
             </div>
-            
-            <!--button class="calc-btn" onclick="calculateAll()">Calculate</button-->
         </div>
 
         <div class="right-panel">
             <div id="result-box" class="sticky-results">
-                <h3>Calculated Sheets</h3>
+                    <h3>Calculated Sheets 
+                        <button class="pack-btn" onclick="toggleInventory()">
+                            🎒 Inventory (<span id="weight-preview">0</span>kg)
+                        </button>
+                        <span id="crit-status"></span>
+                    </h3>
                 
                 <div class="result-category">
                     <h4>⚔️ Combat & Magic</h4>
@@ -97,18 +140,29 @@
                     <p><strong>Action Points:</strong> <span id="res-actions">1</span></p>
                     <p><strong>Movement Distance:</strong> <span id="res-distance">0</span>m</p>
                     <p><strong>Initiative Bonus:</strong> +<span id="res-init">0</span></p>
-                    <p><strong>Carry/Lift Capacity:</strong> <span id="res-carry">50</span>kg</p>
+                    <p><strong>Carry Capacity:</strong> <span id="res-carry">50</span>kg</p>
                     <p><strong>Sensing Range:</strong> <span id="res-sense">0</span>m</p>
                 </div>
             </div>
         </div>
     </div>
+    
     <details class="dm-breakdown">
         <summary>Show Math Breakdown (DM Check)</summary>
-        <div id="dm-math" class="dm-content">
-            </div>
+        <div id="dm-math" class="dm-content"></div>
     </details>
 
+    <div id="delete-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Confirm Deletion</h3>
+            <p id="delete-modal-text">Are you sure you want to delete this character?</p>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+                <button class="btn-confirm" onclick="confirmDelete()">Delete</button>
+            </div>
+        </div>
+    </div>
+    <div id="toast-notification" class="toast hidden"></div>
     <script src="script.js"></script>
 </body>
 </html>
