@@ -335,16 +335,23 @@ hr { border: 0; height: 2px; background: var(--border-main); margin: 30px 0; }
     box-shadow: 0 0 8px rgba(46, 181, 187, 0.2);
 }
 
-/* --- Fix Header Collision on Small Screens --- */
+/* --- Keep Header Strictly on One Line --- */
 .header-container h2 {
-    padding: 0 120px; 
-    text-align: center;
-    line-height: 1.4;
+    white-space: nowrap; /* Forces the title to never break into two lines */
+    z-index: 1; /* Keeps the title visible if things get super tight */
 }
 
+/* On mobile screens, gently shrink the text so it all fits on one line */
 @media(max-width: 600px) {
     .header-container h2 {
-        font-size: 22px; 
-        padding: 0 100px;
+        font-size: 18px; 
+    }
+    .theme-btn {
+        font-size: 12px; 
+        padding: 6px 8px;
+    }
+    .menu-btn {
+        font-size: 16px;
+        padding: 4px 8px;
     }
 }
