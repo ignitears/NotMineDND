@@ -1,4 +1,4 @@
-# Skill Level Up v1.0 - TTRPG Engine
+# Skill Level Up v1.4 - TTRPG Engine
 
 A lightweight, web-based character management system and mechanical calculator for the custom "Skill Level up v.1.0" tabletop role-playing game. It automatically handles the complex math for combat, magic scaling, and resource tracking so players can focus on the story.
 
