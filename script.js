@@ -60,6 +60,7 @@ function rollDice() {
 }
 
 function calculateAll() {
+    // 1. Get Base Inputs
     const weaponBase = parseFloat(document.getElementById('weapon-base').value) || 0;
     const spellBase = parseFloat(document.getElementById('spell-base').value) || 0;
     const d20 = parseFloat(document.getElementById('d20-roll').value) || 0;
@@ -77,22 +78,25 @@ function calculateAll() {
     const manaSup = parseFloat(document.getElementById('mana-supply').value) || 0;
     const sens = parseFloat(document.getElementById('sensing').value) || 0;
 
+    // 2. Crit Status UI
     const resBox = document.getElementById('result-box');
     const critStatus = document.getElementById('crit-status');
     
     resBox.classList.remove('crit-success', 'crit-fail');
     critStatus.innerText = "";
     
+    // Checks the exact, original die roll
     if (d20 === 20) {
         resBox.classList.add('crit-success');
-        critStatus.innerText = " ⭐ CRITICAL SUCCESS!";
+        critStatus.innerText = " ⭐ CRITICAL SUCCESS";
         critStatus.style.color = "var(--color-yellow)";
     } else if (d20 === 1) {
         resBox.classList.add('crit-fail');
-        critStatus.innerText = " 💀 CRITICAL FAILURE!";
+        critStatus.innerText = " 💀 CRITICAL FAILURE";
         critStatus.style.color = "var(--color-red)";
     }
 
+    // 3. Math & Formulas
     let mult = d20 <= 1 ? 0.5 : d20 <= 9 ? 0.75 : d20 <= 11 ? 1 : d20 <= 15 ? 1.5 : d20 <= 19 ? 1.75 : 2;
 
     const damage = weaponBase * ((0.5 * str) + 1) * mult;
@@ -113,7 +117,7 @@ function calculateAll() {
     
     let initBonus = qd <= 20 ? 2 : qd <= 40 ? 4 : qd <= 60 ? 6 : qd <= 80 ? 8 : 10;
 
-    // Inventory Weight Logic
+    // 4. Inventory Weight Logic
     const totalWeight = currentInventory.reduce((sum, item) => sum + (item.weight * item.qty), 0);
     const packBtn = document.querySelector('.pack-btn');
     const carrySpan = document.getElementById('res-carry');
@@ -132,22 +136,28 @@ function calculateAll() {
         carrySpan.innerText = `${totalWeight.toFixed(1)} / ${carryCap}`;
     }
 
+    // 5. Update Max Stat Text
     document.getElementById('max-hp-display').innerText = hp.toFixed(2).replace(/\.00$/, '');
     document.getElementById('max-stamina-display').innerText = stamina.toFixed(2).replace(/\.00$/, '');
     document.getElementById('max-mana-display').innerText = maxMana.toFixed(2).replace(/\.00$/, '');
 
-    document.getElementById('res-damage').innerText = damage.toFixed(2);
-    document.getElementById('res-magic').innerText = magicDmg.toFixed(2);
-    document.getElementById('res-hit').innerText = hitScore.toFixed(2);
-    document.getElementById('res-dodge').innerText = dodgeScore.toFixed(2);
-    document.getElementById('res-cost').innerText = manaCost.toFixed(2);
-    document.getElementById('res-forecast').innerText = extraForecast.toFixed(2);
+    // 6. New Animation Calls
+    animateValue('res-damage', damage);
+    animateValue('res-magic', magicDmg);
+    animateValue('res-hit', hitScore);
+    animateValue('res-dodge', dodgeScore);
+    animateValue('res-cost', manaCost);
+    animateValue('res-forecast', extraForecast);
+    
+    animateValue('res-actions', actions, true);
+    animateValue('res-distance', distance);
+    animateValue('res-init', initBonus, true);
+    animateValue('res-sense', sensingRange, true);
 
-    document.getElementById('res-actions').innerText = actions;
-    document.getElementById('res-distance').innerText = distance.toFixed(2);
-    document.getElementById('res-init').innerText = initBonus;
-    document.getElementById('res-sense').innerText = sensingRange;
+    // 7. Update Visual Progress Bars
+    updateBars(hp, stamina, maxMana);
 
+    // 8. DM Math Breakdown
     document.getElementById('dm-math').innerHTML = `
         ${encumbranceText}
         <p><strong>Physical Damage:</strong> ${weaponBase} * ((0.5 * ${str}) + 1) * ${mult} = ${damage.toFixed(2)}</p>
@@ -297,13 +307,30 @@ function renderCharacters() {
     for (const name in characters) {
         const card = document.createElement('div');
         card.className = 'char-card';
-        card.innerHTML = `
-            <h4>${name}</h4>
-            <div class="char-actions">
-                <button class="btn-load" onclick="loadCharacter('${name}')">Load</button>
-                <button class="btn-delete" onclick="deleteCharacter('${name}')">Delete</button>
-            </div>
-        `;
+        
+        // Safely add the name as text, not HTML
+        const title = document.createElement('h4');
+        title.textContent = name; 
+        
+        const actions = document.createElement('div');
+        actions.className = 'char-actions';
+        
+        // Safely attach the click events without breaking quotes
+        const loadBtn = document.createElement('button');
+        loadBtn.className = 'btn-load';
+        loadBtn.textContent = 'Load';
+        loadBtn.onclick = () => loadCharacter(name); 
+        
+        const delBtn = document.createElement('button');
+        delBtn.className = 'btn-delete';
+        delBtn.textContent = 'Delete';
+        delBtn.onclick = () => deleteCharacter(name); 
+        
+        actions.appendChild(loadBtn);
+        actions.appendChild(delBtn);
+        
+        card.appendChild(title);
+        card.appendChild(actions);
         container.appendChild(card);
     }
 }
@@ -435,4 +462,48 @@ function confirmClearCache() {
 
     // 4. Refresh to show the clean board
     location.reload(); 
+}
+
+/* --- NEW ANIMATION HELPERS --- */
+const animationRequests = {};
+
+function animateValue(id, newValue, isInt = false, duration = 400) {
+    const obj = document.getElementById(id);
+    if (!obj) return;
+    
+    const start = parseFloat(obj.getAttribute('data-val')) || 0;
+    if (start === newValue) return;
+
+    obj.setAttribute('data-val', newValue);
+    if (animationRequests[id]) cancelAnimationFrame(animationRequests[id]);
+
+    let startTimestamp = null;
+    const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        const ease = 1 - Math.pow(1 - progress, 4); // Smooth deceleration
+        const current = start + (newValue - start) * ease;
+        
+        obj.innerText = isInt ? Math.round(current) : current.toFixed(2);
+        
+        if (progress < 1) animationRequests[id] = requestAnimationFrame(step);
+        else obj.innerText = isInt ? newValue : newValue.toFixed(2);
+    };
+    animationRequests[id] = requestAnimationFrame(step);
+}
+
+function updateBars(maxHp, maxStam, maxMana) {
+    if (maxHp === undefined) {
+        maxHp = 100 * ((0.5 * (parseFloat(document.getElementById('constitution').value) || 0)) + 1);
+        maxStam = 100 * ((0.2 * (parseFloat(document.getElementById('endurance').value) || 0)) + 1);
+        maxMana = 100 * ((0.2 * (parseFloat(document.getElementById('mana-supply').value) || 0)) + 1);
+    }
+
+    const curHp = parseFloat(document.getElementById('current-hp').value) || 0;
+    const curStam = parseFloat(document.getElementById('current-stamina').value) || 0;
+    const curMana = parseFloat(document.getElementById('current-mana').value) || 0;
+
+    document.getElementById('hp-bar').style.width = Math.min(Math.max((curHp / maxHp) * 100, 0), 100) + '%';
+    document.getElementById('stamina-bar').style.width = Math.min(Math.max((curStam / maxStam) * 100, 0), 100) + '%';
+    document.getElementById('mana-bar').style.width = Math.min(Math.max((curMana / maxMana) * 100, 0), 100) + '%';
 }

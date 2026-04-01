@@ -56,29 +56,40 @@
                 <button class="pack-btn" onclick="longRest()">🏕️ Long Rest</button>
             </div>
             <div class="tracker-box fancy-trackers">
-                <div class="tracker-row hp-row">
-                    <label>HP:</label>
-                    <div class="fraction hp-fraction">
-                        <input type="number" id="current-hp" value="100"> 
-                        <span class="divider">/</span> 
-                        <span id="max-hp-display" class="max-val">100</span>
+                <div class="tracker-group">
+                    <div class="tracker-row hp-row">
+                        <label>HP:</label>
+                        <div class="fraction hp-fraction">
+                            <input type="number" id="current-hp" value="100" oninput="updateBars()"> 
+                            <span class="divider">/</span> 
+                            <span id="max-hp-display" class="max-val">100</span>
+                        </div>
                     </div>
+                    <div class="bar-bg"><div class="bar-fill hp-fill" id="hp-bar" style="width: 100%;"></div></div>
                 </div>
-                <div class="tracker-row stamina-row">
-                    <label>Stamina:</label>
-                    <div class="fraction stamina-fraction">
-                        <input type="number" id="current-stamina" value="100"> 
-                        <span class="divider">/</span> 
-                        <span id="max-stamina-display" class="max-val">100</span>
+                
+                <div class="tracker-group">
+                    <div class="tracker-row stamina-row">
+                        <label>Stamina:</label>
+                        <div class="fraction stamina-fraction">
+                            <input type="number" id="current-stamina" value="100" oninput="updateBars()"> 
+                            <span class="divider">/</span> 
+                            <span id="max-stamina-display" class="max-val">100</span>
+                        </div>
                     </div>
+                    <div class="bar-bg"><div class="bar-fill stamina-fill" id="stamina-bar" style="width: 100%;"></div></div>
                 </div>
-                <div class="tracker-row mana-row">
-                    <label>Mana:</label>
-                    <div class="fraction mana-fraction">
-                        <input type="number" id="current-mana" value="100"> 
-                        <span class="divider">/</span> 
-                        <span id="max-mana-display" class="max-val">100</span>
+
+                <div class="tracker-group">
+                    <div class="tracker-row mana-row">
+                        <label>Mana:</label>
+                        <div class="fraction mana-fraction">
+                            <input type="number" id="current-mana" value="100" oninput="updateBars()"> 
+                            <span class="divider">/</span> 
+                            <span id="max-mana-display" class="max-val">100</span>
+                        </div>
                     </div>
+                    <div class="bar-bg"><div class="bar-fill mana-fill" id="mana-bar" style="width: 100%;"></div></div>
                 </div>
             </div>
 
