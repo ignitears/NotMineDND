@@ -25,6 +25,11 @@ window.onload = function() {
     
     renderInventory();
     calculateAll();
+
+    // Load saved theme or default to 'fancy'
+    const savedThemeName = localStorage.getItem('selected-theme') || 'fancy';
+    document.getElementById('theme-selector').value = savedThemeName;
+    document.body.setAttribute('data-theme', savedThemeName);
 };
 
 function toggleTheme() {
@@ -506,4 +511,10 @@ function updateBars(maxHp, maxStam, maxMana) {
     document.getElementById('hp-bar').style.width = Math.min(Math.max((curHp / maxHp) * 100, 0), 100) + '%';
     document.getElementById('stamina-bar').style.width = Math.min(Math.max((curStam / maxStam) * 100, 0), 100) + '%';
     document.getElementById('mana-bar').style.width = Math.min(Math.max((curMana / maxMana) * 100, 0), 100) + '%';
+}
+// theme selector logic
+function changeTheme() {
+    const theme = document.getElementById('theme-selector').value;
+    document.body.setAttribute('data-theme', theme);
+    localStorage.setItem('selected-theme', theme);
 }

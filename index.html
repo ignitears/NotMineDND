@@ -28,6 +28,14 @@
         </div>
         <div id="char-cards-container"></div>
         <div class="sidebar-footer">
+            <select id="theme-selector" onchange="changeTheme()" class="io-btn" style="width: 100%; margin-bottom: 10px; border: 1px solid var(--border-input); background: var(--bg-input); color: var(--text-main);">
+                <option value="fancy">✨ Fancy (Default)</option>
+                <option value="playful">🌍 Playful Earth</option>
+                <option value="hallowed">🌫️ Hallowed Mist</option>
+                <option value="grimoire">📖 Grimoire Academy</option>
+                <option value="industrial">⚙️ Industrial Grunge</option>
+                <option value="tavern">🍻 Tavern Tabletop</option>
+            </select>
             <button id="theme-toggle" class="io-btn" onclick="toggleTheme()" style="width: 100%; margin-bottom: 10px; border: 1px solid var(--border-input);">☀️ Light Mode</button>
             <button class="btn-delete" onclick="clearCache()" style="width: 100%; padding: 10px; border-radius: 4px; border: none; cursor: pointer; color: white; font-weight: bold;">🗑️ Clear Cache</button>
         </div>
