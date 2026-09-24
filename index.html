@@ -3,198 +3,337 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RPG Console</title>
-    <link rel="stylesheet" href="style.css">
+    <title>RPG Sheet Console</title>
+    <link rel="stylesheet" href="style_2.css">
 </head>
 <body>
-    <div class="header-container">
-        <button class="menu-btn" onclick="toggleSidebar()">☰</button>
-        <h2>⚔️ RPG Console ⚔️</h2>
+    <button id="menu-btn" class="global-menu-btn no-select" onclick="toggleCharDrawer()">☰</button>
+
+    <!-- Side Drawer for Character Management & Theme Selection -->
+    <div id="char-drawer" class="char-drawer">
+        <div class="drawer-header">
+            <h4>Character Profiles</h4>
+            <button class="close-drawer-btn" onclick="toggleCharDrawer()">✕</button>
+        </div>
+        
+        <div id="char-list" class="char-list"></div>
+        <button class="action-btn create-btn" onclick="openCreatePrompt()">+ New Character</button>
+
+        <div class="backup-divider"></div>
+        <h4>Data Management</h4>
+        <div class="backup-row-btns">
+            <button class="action-btn backup-btn" onclick="exportAllCharacters()">Export All</button>
+            <label class="action-btn backup-btn import-label">
+                Import Character
+                <input type="file" id="import-single-input" accept=".json" onchange="importSingleCharacter(this)" style="display: none;">
+            </label>
+        </div>
+
+        <div class="theme-container">
+            <h4 class="no-select">Theme Selection</h4>
+            <div class="theme-dropdown" id="theme-dropdown">
+                <div class="theme-toggle no-select" onclick="toggleThemeDropdown()">Default Dark</div>
+                <div class="theme-menu">
+                    <div class="theme-item no-select" onclick="selectTheme('default', 'Default Dark')">Default Dark</div>
+                    <div class="theme-item no-select" onclick="selectTheme('default-light', 'Default Light')">Default Light</div>
+                    <div class="theme-item no-select" onclick="selectTheme('proxy', 'Proxy Terminal')">Proxy Terminal</div>
+                    <div class="theme-item no-select" onclick="selectTheme('playful-earth', 'Playful Earth')">Playful Earth</div>
+                    <div class="theme-item no-select" onclick="selectTheme('cyber', 'Cyber Futuristic')">Cyber Futuristic</div>
+                    <div class="theme-item no-select" onclick="selectTheme('hallowed-mist', 'Hallowed Mist')">Hallowed Mist</div>
+                    <div class="theme-item no-select" onclick="selectTheme('industrial', 'Industrial Grunge')">Industrial Grunge</div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div id="sidebar" class="sidebar">
-        <div class="sidebar-header">
-            <h3>Characters</h3>
-            <button class="close-btn" onclick="toggleSidebar()">✖</button>
-        </div>
-        <div class="sidebar-inputs">
-            <input type="text" id="char-name-input" placeholder="Character Name">
-            <button class="save-btn" onclick="saveCharacter()">Save</button>
-            <div class="io-actions">
-                <button class="io-btn" onclick="exportData()">📥 Export</button>
-                <button class="io-btn" onclick="document.getElementById('import-file').click()">📤 Import</button>
-                <input type="file" id="import-file" style="display:none" accept=".json" onchange="importData(event)">
-            </div>
-        </div>
-        <div id="char-cards-container"></div>
-        <div class="sidebar-footer">
-            <select id="theme-selector" onchange="changeTheme()" class="io-btn" style="width: 100%; margin-bottom: 10px; border: 1px solid var(--border-input); background: var(--bg-input); color: var(--text-main);">
-                <option value="fancy">✨ Fancy (Default)</option>
-                <option value="playful">🌍 Playful Earth</option>
-                <option value="hallowed">🌫️ Hallowed Mist</option>
-                <option value="grimoire">📖 Grimoire Academy</option>
-                <option value="industrial">⚙️ Industrial Grunge</option>
-                <option value="tavern">🍻 Tavern Tabletop</option>
-            </select>
-            <button id="theme-toggle" class="io-btn" onclick="toggleTheme()" style="width: 100%; margin-bottom: 10px; border: 1px solid var(--border-input);">☀️ Light Mode</button>
-            <button class="btn-delete" onclick="clearCache()" style="width: 100%; padding: 10px; border-radius: 4px; border: none; cursor: pointer; color: white; font-weight: bold;">🗑️ Clear Cache</button>
-        </div>
-    </div>
+    <div class="container" style="margin-top: 50px;">
+        <!-- Left Profile Column -->
+        <div class="column left-col">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="no-select">PROFILE: <span id="header-name">Hero</span></h3>
+                    <div class="main-lvl no-select">
+                        Lvl <input type="number" id="char-level" data-save="true" value="1">
+                    </div>
+                </div>
+                <label class="image-upload no-select" style="position: relative;">
+                    <span id="upload-text">Click to Upload Image</span>
+                    <img id="char-image" src="" alt="Character">
+                    <button id="clear-img-btn" class="small-btn del" style="display:none; position:absolute; top:10px; right:10px; z-index:10; background:var(--card-bg); padding:6px;">✕</button>
+                    <input type="file" id="image-input" accept="image/*" style="display: none;">
+                </label>
 
-    <div id="inventory-sidebar" class="sidebar right-sidebar">
-        <div class="sidebar-header">
-            <h3>Backpack</h3>
-            <button class="close-btn" onclick="toggleInventory()">✖</button>
-        </div>
-        <div class="sidebar-inputs">
-            <input type="text" id="item-name" placeholder="Item Name (e.g., Iron Sword)">
-            <div class="split-inputs">
-                <input type="number" id="item-weight" placeholder="Weight (kg)">
-                <input type="number" id="item-qty" placeholder="Qty" value="1">
+                <div class="collapsible no-select" onclick="toggleDetails()">Lore & Details <span id="arrow-icon">▼</span></div>
+                <div id="profile-details">
+                    <div class="input-group">
+                        <label class="no-select">Name</label><input type="text" id="name" data-save="true">
+                    </div>
+                    <div class="input-group">
+                        <label class="no-select">Family</label><input type="text" id="family-name" data-save="true">
+                    </div>
+                    <div class="input-group">
+                        <label class="no-select">Age</label><input type="number" id="age" data-save="true">
+                    </div>
+
+                    <label class="textarea-label no-select">Appearance</label>
+                    <textarea id="appearance" data-save="true"></textarea>
+                    
+                    <label class="textarea-label no-select">Personality</label>
+                    <textarea id="personality" data-save="true"></textarea>
+                    
+                    <label class="textarea-label no-select">Backstory</label>
+                    <textarea id="backstory" data-save="true"></textarea>
+                </div>
             </div>
-            <button class="save-btn" onclick="addInventoryItem()">Add Item</button>
         </div>
-        <hr>
-        <div id="inventory-list" class="inventory-list"></div>
-    </div>
-    
-    <div class="dashboard">
-        <div class="left-panel">
-            <div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
-                <button class="pack-btn" onclick="longRest()">🏕️ Long Rest</button>
-            </div>
-            <div class="tracker-box fancy-trackers">
-                <div class="tracker-group">
-                    <div class="tracker-row hp-row">
-                        <label>HP:</label>
-                        <div class="fraction hp-fraction">
-                            <input type="number" id="current-hp" value="100" oninput="updateBars()"> 
-                            <span class="divider">/</span> 
-                            <span id="max-hp-display" class="max-val">100</span>
+
+        <!-- Right Main Column -->
+        <div class="column right-col">
+            <!-- Combat Status -->
+            <div class="card vitals-card">
+                <div class="card-header">
+                    <h3 class="no-select">Combat Status</h3>
+                </div>
+
+                <div class="rest-btn-container no-select">
+                    <button class="rest-btn short-rest" onclick="shortRest()">Short Rest</button>
+                    <button class="rest-btn long-rest" onclick="longRest()">Long Rest</button>
+                </div>
+
+                <div class="vitals-grid">
+                    <!-- HP Box -->
+                    <div class="vital-box hp-box" id="hp-box">
+                        <div class="vital-header no-select">
+                            <span class="vital-title" style="color: var(--hp-color);">HP</span>
+                        </div>
+                        <div class="split-input">
+                            <input type="number" id="current-hp" data-save="true" value="100">
+                            <span class="divider">/</span>
+                            <input type="number" id="max-hp-display" readonly>
+                        </div>
+                        <div class="vital-bonuses">
+                            <div class="input-group bonus-group">
+                                <label>Bonus HP</label>
+                                <input type="number" id="bonus-hp" data-save="true" value="0">
+                            </div>
+                            <div class="input-group bonus-group">
+                                <label>Bonus %</label>
+                                <input type="number" id="bonus-pct-hp" data-save="true" value="0">
+                            </div>
                         </div>
                     </div>
-                    <div class="bar-bg"><div class="bar-fill hp-fill" id="hp-bar" style="width: 100%;"></div></div>
-                </div>
-                
-                <div class="tracker-group">
-                    <div class="tracker-row stamina-row">
-                        <label>Stamina:</label>
-                        <div class="fraction stamina-fraction">
-                            <input type="number" id="current-stamina" value="100" oninput="updateBars()"> 
-                            <span class="divider">/</span> 
-                            <span id="max-stamina-display" class="max-val">100</span>
+
+                    <!-- Stamina Box -->
+                    <div class="vital-box stamina-box" id="stamina-box">
+                        <div class="vital-header no-select">
+                            <span class="vital-title" style="color: var(--stamina-color);">STAMINA</span>
+                        </div>
+                        <div class="split-input">
+                            <input type="number" id="current-stamina" data-save="true" value="100">
+                            <span class="divider">/</span>
+                            <input type="number" id="max-stamina-display" readonly>
+                        </div>
+                        <div class="vital-bonuses">
+                            <div class="input-group bonus-group">
+                                <label>Bonus Stam</label>
+                                <input type="number" id="bonus-stamina" data-save="true" value="0">
+                            </div>
+                            <div class="input-group bonus-group">
+                                <label>Bonus %</label>
+                                <input type="number" id="bonus-pct-stamina" data-save="true" value="0">
+                            </div>
                         </div>
                     </div>
-                    <div class="bar-bg"><div class="bar-fill stamina-fill" id="stamina-bar" style="width: 100%;"></div></div>
-                </div>
 
-                <div class="tracker-group">
-                    <div class="tracker-row mana-row">
-                        <label>Mana:</label>
-                        <div class="fraction mana-fraction">
-                            <input type="number" id="current-mana" value="100" oninput="updateBars()"> 
-                            <span class="divider">/</span> 
-                            <span id="max-mana-display" class="max-val">100</span>
+                    <!-- Mana Box -->
+                    <div class="vital-box mana-box" id="mana-box">
+                        <div class="vital-header no-select">
+                            <span class="vital-title" style="color: var(--mana-color);">MANA</span>
+                        </div>
+                        <div class="split-input">
+                            <input type="number" id="current-mana" data-save="true" value="100">
+                            <span class="divider">/</span>
+                            <input type="number" id="max-mana-display" readonly>
+                        </div>
+                        <div class="vital-bonuses">
+                            <div class="input-group bonus-group">
+                                <label>Bonus Mana</label>
+                                <input type="number" id="bonus-mana" data-save="true" value="0">
+                            </div>
+                            <div class="input-group bonus-group">
+                                <label>Bonus %</label>
+                                <input type="number" id="bonus-pct-mana" data-save="true" value="0">
+                            </div>
                         </div>
                     </div>
-                    <div class="bar-bg"><div class="bar-fill mana-fill" id="mana-bar" style="width: 100%;"></div></div>
                 </div>
             </div>
 
-            <div class="highlight-box">
-                <div class="big-input-group">
-                    <label>Weapon Base Dmg:</label>
-                    <input type="number" class="large-input" id="weapon-base" value="10">
+            <!-- Tabs Navigation -->
+            <div class="tabs no-select">
+                <div class="tab active" data-target="tab-stats">Stats</div>
+                <div class="tab" data-target="tab-dice">Dice & Calculations</div>
+                <div class="tab" data-target="tab-weapon">Weapon (Placeholder)</div>
+                <div class="tab" data-target="tab-inventory">Inventory</div>
+                <div class="tab" data-target="tab-nerd">Nerd</div>
+            </div>
+
+            <!-- Tab 1: Stats (4 Categorized Cards - Fixed 2x2 Layout) -->
+            <div id="tab-stats" class="tab-content active stat-grid">
+                <!-- Physical -->
+                <div class="card animate-card">
+                    <div class="card-header no-select"><h3>Physical</h3></div>
+                    <div class="input-group" data-tooltip="Strength: Multiplies base weapon damage and boosts carry capacity.">
+                        <label class="no-select">Strength</label><input type="number" id="strength" data-save="true" value="0">
+                    </div>
+                    <div class="input-group" data-tooltip="Speed: Increases movement distance per turn.">
+                        <label class="no-select">Speed</label><input type="number" id="speed" data-save="true" value="0">
+                    </div>
+                    <div class="input-group" data-tooltip="Endurance: Determines maximum character Stamina.">
+                        <label class="no-select">Endurance</label><input type="number" id="endurance" data-save="true" value="0">
+                    </div>
+                    <div class="input-group" data-tooltip="Constitution: Determines maximum character Hit Points (HP).">
+                        <label class="no-select">Constitution</label><input type="number" id="constitution" data-save="true" value="0">
+                    </div>
                 </div>
-                <div class="big-input-group">
-                    <label>Spell Base Power:</label>
-                    <input type="number" class="large-input" id="spell-base" value="10">
+
+                <!-- Combat Skill -->
+                <div class="card animate-card">
+                    <div class="card-header no-select"><h3>Combat Skill</h3></div>
+                    <div class="input-group" data-tooltip="Dexterity: Powers Dodge checks and grants extra action points.">
+                        <label class="no-select">Dexterity</label><input type="number" id="dexterity" data-save="true" value="0">
+                    </div>
+                    <div class="input-group" data-tooltip="Accuracy: Modifies primary accuracy checks for landing attacks.">
+                        <label class="no-select">Accuracy</label><input type="number" id="accuracy" data-save="true" value="0">
+                    </div>
+                    <div class="input-group" data-tooltip="Forecast: Grants extra forecast precision to Hit and Dodge checks.">
+                        <label class="no-select">Forecast</label><input type="number" id="forecast" data-save="true" value="0">
+                    </div>
+                    <div class="input-group" data-tooltip="Quickdraw: Provides flat initiative bonuses in combat encounters.">
+                        <label class="no-select">Quickdraw</label><input type="number" id="quickdraw" data-save="true" value="0">
+                    </div>
                 </div>
-                <div class="big-input-group">
-                    <label>d20 Roll:</label>
-                    <div class="dice-wrapper">
-                        <input type="number" class="large-input" id="d20-roll" value="10">
-                        <button class="dice-btn" id="dice-button" onclick="rollDice()">🎲</button>
+
+                <!-- Intelligence -->
+                <div class="card animate-card">
+                    <div class="card-header no-select"><h3>Intelligence</h3></div>
+                    <div class="input-group" data-tooltip="Learning: Raw skill tracking for acquiring techniques and knowledge.">
+                        <label class="no-select">Learning</label><input type="number" id="learning" data-save="true" value="0">
+                    </div>
+                    <div class="input-group" data-tooltip="Analysis: Raw skill tracking for examining systems, clues, and tactics.">
+                        <label class="no-select">Analysis</label><input type="number" id="analysis" data-save="true" value="0">
+                    </div>
+                    <div class="input-group" data-tooltip="Wisdom: Raw skill tracking for insight, mental resilience, and crafting checks.">
+                        <label class="no-select">Wisdom</label><input type="number" id="wisdom" data-save="true" value="0">
+                    </div>
+                    <div class="input-group" data-tooltip="Adaptation: Raw skill tracking for dynamic environmental adjustments.">
+                        <label class="no-select">Adaptation</label><input type="number" id="adaptation" data-save="true" value="0">
+                    </div>
+                </div>
+
+                <!-- Magic Skill -->
+                <div class="card animate-card">
+                    <div class="card-header no-select"><h3>Magic Skill</h3></div>
+                    <div class="input-group" data-tooltip="Casting: Scales spell base power into active magical damage.">
+                        <label class="no-select">Casting</label><input type="number" id="casting" data-save="true" value="0">
+                    </div>
+                    <div class="input-group" data-tooltip="Sensing: Determines magical detection and awareness range in meters.">
+                        <label class="no-select">Sensing</label><input type="number" id="sensing" data-save="true" value="0">
+                    </div>
+                    <div class="input-group" data-tooltip="Control: Reduces spell mana expenditure by percentage.">
+                        <label class="no-select">Control</label><input type="number" id="control" data-save="true" value="0">
+                    </div>
+                    <div class="input-group" data-tooltip="Mana Supply: Increases maximum character Mana reserves.">
+                        <label class="no-select">Mana Supply</label><input type="number" id="mana-supply" data-save="true" value="0">
                     </div>
                 </div>
             </div>
 
-            <hr>
-
-            <h3>Raw Attributes</h3>
-            <div class="stats-grid">
-                <div class="input-row"><label>Strength:</label> <input type="number" id="strength" value="0"></div>
-                <div class="input-row"><label>Speed:</label> <input type="number" id="speed" value="0"></div>
-                <div class="input-row"><label>Endurance:</label> <input type="number" id="endurance" value="0"></div>
-                <div class="input-row"><label>Constitution:</label> <input type="number" id="constitution" value="0"></div>
-                <div class="input-row"><label>Dexterity:</label> <input type="number" id="dexterity" value="0"></div>
-                <div class="input-row"><label>Accuracy:</label> <input type="number" id="accuracy" value="0"></div>
-                <div class="input-row"><label>Forecast:</label> <input type="number" id="forecast" value="0"></div>
-                <div class="input-row"><label>Quickdraw:</label> <input type="number" id="quickdraw" value="0"></div>
-                <div class="input-row"><label>Casting:</label> <input type="number" id="casting" value="0"></div>
-                <div class="input-row"><label>Control:</label> <input type="number" id="control" value="0"></div>
-                <div class="input-row"><label>Mana Supply:</label> <input type="number" id="mana-supply" value="0"></div>
-                <div class="input-row"><label>Sensing:</label> <input type="number" id="sensing" value="0"></div>
-            </div>
-        </div>
-
-        <div class="right-panel">
-            <div id="result-box" class="sticky-results">
-                    <h3>Calculated Sheets 
-                        <button class="pack-btn" onclick="toggleInventory()">
-                            🎒 Inventory (<span id="weight-preview">0</span>kg)
-                        </button>
-                        <span id="crit-status"></span>
-                    </h3>
-                
-                <div class="result-category">
-                    <h4>⚔️ Combat & Magic</h4>
-                    <p><strong>Physical Damage:</strong> <span id="res-damage">0</span></p>
-                    <p><strong>Magic Damage:</strong> <span id="res-magic">0</span></p>
-                    <p><strong>Hit Score (Accuracy):</strong> <span id="res-hit">0</span></p>
-                    <p><strong>Dodge Score:</strong> <span id="res-dodge">0</span></p>
-                    <p><strong>Spell Mana Cost:</strong> <span id="res-cost">0</span></p>
-                    <p><strong>Extra Forecast Pts:</strong> <span id="res-forecast">0</span></p>
+            <!-- Tab 2: In-Page Dice & Calculated Sheets -->
+            <div id="tab-dice" class="tab-content card">
+                <div class="card-header">
+                    <h3 class="no-select">In-Page Dice Roller</h3>
+                    <span id="crit-status" class="no-select"></span>
+                </div>
+                <div class="dice-section">
+                    <div class="dice-controls">
+                        <div class="input-group" style="max-width: 140px;">
+                            <label class="no-select">d20 Roll</label>
+                            <input type="number" id="d20-roll" data-save="true" value="10" min="1" max="20">
+                        </div>
+                        <button class="action-btn dice-roll-btn" id="dice-btn" onclick="rollDice()">🎲 Roll d20</button>
+                    </div>
                 </div>
 
-                <div class="result-category">
-                    <h4>🏃 Utility & Movement</h4>
-                    <p><strong>Action Points:</strong> <span id="res-actions">1</span></p>
-                    <p><strong>Movement Distance:</strong> <span id="res-distance">0</span>m</p>
-                    <p><strong>Initiative Bonus:</strong> +<span id="res-init">0</span></p>
-                    <p><strong>Carry Capacity:</strong> <span id="res-carry">50</span>kg</p>
-                    <p><strong>Sensing Range:</strong> <span id="res-sense">0</span>m</p>
+                <div class="card-header" style="margin-top: 25px;">
+                    <h3 class="no-select">Calculated Sheets</h3>
+                </div>
+                <div class="calc-results-grid">
+                    <div class="calc-category">
+                        <h4>⚔️ Combat & Magic</h4>
+                        <p><strong>Physical Damage:</strong> <span id="res-damage">0</span></p>
+                        <p><strong>Magic Damage:</strong> <span id="res-magic">0</span></p>
+                        <p><strong>Hit Score (Accuracy):</strong> <span id="res-hit">0</span></p>
+                        <p><strong>Dodge Score:</strong> <span id="res-dodge">0</span></p>
+                        <p><strong>Spell Mana Cost:</strong> <span id="res-cost">0</span></p>
+                        <p><strong>Extra Forecast Pts:</strong> <span id="res-forecast">0</span></p>
+                    </div>
+                    <div class="calc-category">
+                        <h4>🏃 Utility & Movement</h4>
+                        <p><strong>Action Points:</strong> <span id="res-actions">1</span></p>
+                        <p><strong>Movement Distance:</strong> <span id="res-distance">0</span>m</p>
+                        <p><strong>Initiative Bonus:</strong> +<span id="res-init">0</span></p>
+                        <p><strong>Carry Capacity:</strong> <span id="res-carry">50</span>kg</p>
+                        <p><strong>Sensing Range:</strong> <span id="res-sense">0</span>m</p>
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-    
-    <details class="dm-breakdown">
-        <summary>Show Math Breakdown (DM Check)</summary>
-        <div id="dm-math" class="dm-content"></div>
-    </details>
 
-    <div id="delete-modal" class="modal hidden">
-        <div class="modal-content">
-            <h3>Confirm Deletion</h3>
-            <p id="delete-modal-text">Are you sure you want to delete this character?</p>
-            <div class="modal-actions">
-                <button class="btn-cancel" onclick="closeModal()">Cancel</button>
-                <button class="btn-confirm" onclick="confirmDelete()">Delete</button>
+            <!-- Tab 3: Weapon (Placeholder from Not Mine DnD) -->
+            <div id="tab-weapon" class="tab-content card">
+                <div class="card-header"><h3 class="no-select">Weapon Bases (Placeholder)</h3></div>
+                <div class="equipment-grid">
+                    <div class="input-group">
+                        <label class="no-select">Weapon Base Dmg</label>
+                        <input type="number" id="weapon-base" data-save="true" value="10">
+                    </div>
+                    <div class="input-group">
+                        <label class="no-select">Spell Base Power</label>
+                        <input type="number" id="spell-base" data-save="true" value="10">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 4: Basic Inventory (Item name and Qty) -->
+            <div id="tab-inventory" class="tab-content card">
+                <div class="card-header">
+                    <h3 class="no-select">Inventory</h3>
+                    <button class="action-btn" onclick="addInventoryItem()">+ Add Item</button>
+                </div>
+                <div id="inventory-list" class="ability-list"></div>
+            </div>
+
+            <!-- Tab 5: Nerd Tab (Analytics & DM Math Breakdown) -->
+            <div id="tab-nerd" class="tab-content card">
+                <div class="card-header"><h3 class="no-select">Deep Analytics & DM Check</h3></div>
+                <div id="dm-math" class="dm-breakdown-content"></div>
             </div>
         </div>
     </div>
-    <div id="clear-cache-modal" class="modal hidden">
-        <div class="modal-content">
-            <h3>🧹 Clear Console</h3>
-            <p>This will reset the current board, removing unsaved stats and dice rolls. Your saved characters will <strong>not</strong> be deleted. Proceed?</p>
-            <div class="modal-actions">
-                <button class="btn-cancel" onclick="closeClearCacheModal()">Cancel</button>
-                <button class="btn-confirm" onclick="confirmClearCache()">Clear Board</button>
+
+    <!-- Custom Reusable Modal Dialog -->
+    <div id="custom-dialog" class="dialog-overlay">
+        <div class="dialog-content">
+            <h4 id="dialog-title" class="no-select">System Notice</h4>
+            <p id="dialog-text">Message</p>
+            <input type="text" id="dialog-input" placeholder="Type here...">
+            <div class="dialog-actions no-select">
+                <button id="dialog-cancel-btn" class="action-btn cancel-style">Cancel</button>
+                <button id="dialog-confirm-btn" class="action-btn">Confirm</button>
             </div>
         </div>
     </div>
-    <div id="toast-notification" class="toast hidden"></div>
-    <script src="script.js"></script>
+
+    <script src="script_2.js"></script>
 </body>
 </html>

@@ -1,109 +1,103 @@
-let currentInventory = [];
-let currentCharacter = null; 
+// --- Character Management State ---
+let charList = JSON.parse(localStorage.getItem('dnd_char_list_master')) || ['Hero'];
+let activeChar = localStorage.getItem('dnd_active_char_master') || charList[0];
+let prefix = `dnd_v5_${activeChar}_`;
 
 window.onload = function() {
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'light') {
-        document.body.classList.add('light-mode');
-        document.getElementById('theme-toggle').innerText = '🌙 Dark Mode';
-    }
-
-    renderCharacters(); 
-
-    const inputs = document.querySelectorAll('.dashboard input[type="number"]');
-    inputs.forEach(input => {
-        const savedValue = localStorage.getItem(input.id);
-        if (savedValue !== null) input.value = savedValue;
-        input.addEventListener('input', () => {
-            localStorage.setItem(input.id, input.value);
-            calculateAll();
-        });
-    });
-    
-    const savedInv = localStorage.getItem('current_inventory');
-    if (savedInv) currentInventory = JSON.parse(savedInv);
-    
-    renderInventory();
-    calculateAll();
-
-    // Load saved theme or default to 'fancy'
-    const savedThemeName = localStorage.getItem('selected-theme') || 'fancy';
-    document.getElementById('theme-selector').value = savedThemeName;
-    document.body.setAttribute('data-theme', savedThemeName);
+    initTheme();
+    loadActiveCharacter();
+    renderCharList();
+    setupTooltips();
 };
 
-function toggleTheme() {
-    document.body.classList.toggle('light-mode');
-    const isLight = document.body.classList.contains('light-mode');
-    localStorage.setItem('theme', isLight ? 'light' : 'dark');
-    document.getElementById('theme-toggle').innerText = isLight ? '🌙 Dark Mode' : '☀️ Light Mode';
+// --- Tab Switching ---
+const tabs = document.querySelectorAll('.tabs .tab');
+const tabContents = document.querySelectorAll('.tab-content');
+tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        tabContents.forEach(c => c.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById(tab.dataset.target).classList.add('active');
+    });
+});
+
+// --- Profile Lore Drawer ---
+function toggleDetails() {
+    const details = document.getElementById('profile-details');
+    const arrow = document.getElementById('arrow-icon');
+    details.classList.toggle('open');
+    if (arrow) arrow.style.transform = details.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
 }
 
-function rollDice() {
-    const btn = document.getElementById('dice-button');
-    const input = document.getElementById('d20-roll');
-    
-    btn.disabled = true;
-    btn.classList.add('rolling');
+// --- Character Image Uploading ---
+const imageInput = document.getElementById('image-input');
+const charImage = document.getElementById('char-image');
+const uploadText = document.getElementById('upload-text');
+const clearImgBtn = document.getElementById('clear-img-btn');
 
-    let rolls = 0;
-    const rollInterval = setInterval(() => {
-        input.value = Math.floor(Math.random() * 20) + 1;
-        rolls++;
-        
-        if (rolls > 16) {
-            clearInterval(rollInterval);
-            const finalResult = Math.floor(Math.random() * 20) + 1;
-            input.value = finalResult;
-            localStorage.setItem('d20-roll', finalResult);
-            
-            btn.disabled = false;
-            btn.classList.remove('rolling');
-            calculateAll();
-        }
-    }, 50); 
-}
+imageInput.addEventListener('change', function() {
+    const file = this.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            charImage.src = e.target.result;
+            charImage.style.display = 'block';
+            uploadText.style.display = 'none';
+            clearImgBtn.style.display = 'block';
+            localStorage.setItem(prefix + 'image', e.target.result);
+        };
+        reader.readAsDataURL(file);
+    }
+});
 
+clearImgBtn.addEventListener('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation(); // Prevents the file upload prompt from triggering
+    charImage.src = '';
+    charImage.style.display = 'none';
+    uploadText.style.display = 'block';
+    clearImgBtn.style.display = 'none';
+    imageInput.value = '';
+    localStorage.removeItem(prefix + 'image');
+});
+
+
+// --- Mathematical Engine (Not Mine DnD Formulas) ---
 function calculateAll() {
-    // 1. Get Base Inputs
     const weaponBase = parseFloat(document.getElementById('weapon-base').value) || 0;
     const spellBase = parseFloat(document.getElementById('spell-base').value) || 0;
     const d20 = parseFloat(document.getElementById('d20-roll').value) || 0;
-    
+
     const str = parseFloat(document.getElementById('strength').value) || 0;
     const spd = parseFloat(document.getElementById('speed').value) || 0;
     const end = parseFloat(document.getElementById('endurance').value) || 0;
     const con = parseFloat(document.getElementById('constitution').value) || 0;
+
     const dex = parseFloat(document.getElementById('dexterity').value) || 0;
     const acc = parseFloat(document.getElementById('accuracy').value) || 0;
     const forc = parseFloat(document.getElementById('forecast').value) || 0;
     const qd = parseFloat(document.getElementById('quickdraw').value) || 0;
+
     const cast = parseFloat(document.getElementById('casting').value) || 0;
+    const sens = parseFloat(document.getElementById('sensing').value) || 0;
     const ctrl = parseFloat(document.getElementById('control').value) || 0;
     const manaSup = parseFloat(document.getElementById('mana-supply').value) || 0;
-    const sens = parseFloat(document.getElementById('sensing').value) || 0;
 
-    // 2. Crit Status UI
-    const resBox = document.getElementById('result-box');
+    // Crit Status
     const critStatus = document.getElementById('crit-status');
-    
-    resBox.classList.remove('crit-success', 'crit-fail');
-    critStatus.innerText = "";
-    
-    // Checks the exact, original die roll
     if (d20 === 20) {
-        resBox.classList.add('crit-success');
-        critStatus.innerText = " ⭐ CRITICAL SUCCESS";
-        critStatus.style.color = "var(--color-yellow)";
+        critStatus.innerText = "⭐ CRITICAL SUCCESS";
+        critStatus.style.color = "var(--stamina-color)";
     } else if (d20 === 1) {
-        resBox.classList.add('crit-fail');
-        critStatus.innerText = " 💀 CRITICAL FAILURE";
-        critStatus.style.color = "var(--color-red)";
+        critStatus.innerText = "💀 CRITICAL FAILURE";
+        critStatus.style.color = "var(--danger)";
+    } else {
+        critStatus.innerText = "";
     }
 
-    // 3. Math & Formulas
-    let mult = d20 <= 1 ? 0.5 : d20 <= 9 ? 0.75 : d20 <= 11 ? 1 : d20 <= 15 ? 1.5 : d20 <= 19 ? 1.75 : 2;
-
+    // Formulas
+    const mult = d20 <= 1 ? 0.5 : d20 <= 9 ? 0.75 : d20 <= 11 ? 1 : d20 <= 15 ? 1.5 : d20 <= 19 ? 1.75 : 2;
     const damage = weaponBase * ((0.5 * str) + 1) * mult;
     const magicDmg = spellBase * ((0.5 * cast) + 1);
     const extraForecast = 10 * ((0.05 * forc) + 1) * d20;
@@ -111,410 +105,428 @@ function calculateAll() {
     const hitScore = (10 * ((0.1 * acc) + 1) * d20) + extraForecast;
     const manaCost = spellBase * ((100 - ctrl) / 100);
 
-    const stamina = 100 * ((0.2 * end) + 1);
-    const hp = 100 * ((0.5 * con) + 1);
-    const maxMana = 100 * ((0.2 * manaSup) + 1);
+    // Vitals Base Values
+    const baseHp = 100 * ((0.5 * con) + 1);
+    const baseStamina = 100 * ((0.2 * end) + 1);
+    const baseMana = 100 * ((0.2 * manaSup) + 1);
+
+    // Vitals Bonus Integrations
+    const bonusHp = parseFloat(document.getElementById('bonus-hp').value) || 0;
+    const bonusPctHp = parseFloat(document.getElementById('bonus-pct-hp').value) || 0;
+    
+    const bonusStam = parseFloat(document.getElementById('bonus-stamina').value) || 0;
+    const bonusPctStam = parseFloat(document.getElementById('bonus-pct-stamina').value) || 0;
+    
+    const bonusManaVal = parseFloat(document.getElementById('bonus-mana').value) || 0;
+    const bonusPctMana = parseFloat(document.getElementById('bonus-pct-mana').value) || 0;
+
+    // Scaled Maximum Vitals
+    const maxHp = (baseHp + bonusHp) * (1 + (bonusPctHp / 100));
+    const maxStamina = (baseStamina + bonusStam) * (1 + (bonusPctStam / 100));
+    const maxMana = (baseMana + bonusManaVal) * (1 + (bonusPctMana / 100));
 
     const distance = 10 * ((0.2 * spd) + 1);
     const carryCap = 50 + (str * 5);
     const actions = 1 + Math.floor(dex / 20);
     const sensingRange = sens * 30;
-    
-    let initBonus = qd <= 20 ? 2 : qd <= 40 ? 4 : qd <= 60 ? 6 : qd <= 80 ? 8 : 10;
+    const initBonus = qd <= 20 ? 2 : qd <= 40 ? 4 : qd <= 60 ? 6 : qd <= 80 ? 8 : 10;
 
-    // 4. Inventory Weight Logic
-    const totalWeight = currentInventory.reduce((sum, item) => sum + (item.weight * item.qty), 0);
-    const packBtn = document.querySelector('.pack-btn');
-    const carrySpan = document.getElementById('res-carry');
-    
-    document.getElementById('weight-preview').innerText = totalWeight.toFixed(1);
-    
-    let encumbranceText = "";
-    if (totalWeight > carryCap) {
-        packBtn.classList.add('overweight');
-        carrySpan.classList.add('text-red');
-        carrySpan.innerText = `${totalWeight.toFixed(1)} / ${carryCap} (OVERBURDENED)`;
-        encumbranceText = `<p class="text-red"><strong>Encumbrance Warning:</strong> Carrying ${totalWeight.toFixed(1)}kg (Exceeds ${carryCap}kg max). Speed/Dodge penalties apply!</p>`;
-    } else {
-        packBtn.classList.remove('overweight');
-        carrySpan.classList.remove('text-red');
-        carrySpan.innerText = `${totalWeight.toFixed(1)} / ${carryCap}`;
-    }
+    // Write Values
+    document.getElementById('max-hp-display').value = maxHp.toFixed(0);
+    document.getElementById('max-stamina-display').value = maxStamina.toFixed(0);
+    document.getElementById('max-mana-display').value = maxMana.toFixed(0);
 
-    // 5. Update Max Stat Text
-    document.getElementById('max-hp-display').innerText = hp.toFixed(2).replace(/\.00$/, '');
-    document.getElementById('max-stamina-display').innerText = stamina.toFixed(2).replace(/\.00$/, '');
-    document.getElementById('max-mana-display').innerText = maxMana.toFixed(2).replace(/\.00$/, '');
+    document.getElementById('res-damage').innerText = damage.toFixed(2);
+    document.getElementById('res-magic').innerText = magicDmg.toFixed(2);
+    document.getElementById('res-hit').innerText = hitScore.toFixed(2);
+    document.getElementById('res-dodge').innerText = dodgeScore.toFixed(2);
+    document.getElementById('res-cost').innerText = manaCost.toFixed(2);
+    document.getElementById('res-forecast').innerText = extraForecast.toFixed(2);
 
-    // 6. New Animation Calls
-    animateValue('res-damage', damage);
-    animateValue('res-magic', magicDmg);
-    animateValue('res-hit', hitScore);
-    animateValue('res-dodge', dodgeScore);
-    animateValue('res-cost', manaCost);
-    animateValue('res-forecast', extraForecast);
-    
-    animateValue('res-actions', actions, true);
-    animateValue('res-distance', distance);
-    animateValue('res-init', initBonus, true);
-    animateValue('res-sense', sensingRange, true);
+    document.getElementById('res-actions').innerText = actions;
+    document.getElementById('res-distance').innerText = distance.toFixed(1);
+    document.getElementById('res-init').innerText = initBonus;
+    document.getElementById('res-carry').innerText = carryCap;
+    document.getElementById('res-sense').innerText = sensingRange;
 
-    // 7. Update Visual Progress Bars
-    updateBars(hp, stamina, maxMana);
+    // Update Top-Border Visual Progress Bars
+    updateVitalsVisuals(maxHp, maxStamina, maxMana);
 
-    // 8. DM Math Breakdown
+    // Nerd Tab Breakdown
     document.getElementById('dm-math').innerHTML = `
-        ${encumbranceText}
         <p><strong>Physical Damage:</strong> ${weaponBase} * ((0.5 * ${str}) + 1) * ${mult} = ${damage.toFixed(2)}</p>
         <p><strong>Magic Damage:</strong> ${spellBase} * ((0.5 * ${cast}) + 1) = ${magicDmg.toFixed(2)}</p>
         <p><strong>Hit Score:</strong> [10 * ((0.1 * ${acc}) + 1) * ${d20}] + ${extraForecast.toFixed(2)} = ${hitScore.toFixed(2)}</p>
         <p><strong>Dodge Score:</strong> [10 * ((0.1 * ${dex}) + 1) * ${d20}] + ${extraForecast.toFixed(2)} = ${dodgeScore.toFixed(2)}</p>
-        <p><strong>Max HP:</strong> 100 * ((0.5 * ${con}) + 1) = ${hp.toFixed(2)}</p>
-        <p><strong>Stamina:</strong> 100 * ((0.2 * ${end}) + 1) = ${stamina.toFixed(2)}</p>
-        <p><strong>Max Mana:</strong> 100 * ((0.2 * ${manaSup}) + 1) = ${maxMana.toFixed(2)}</p>
+        <p><strong>Max HP:</strong> (${baseHp.toFixed(2)} Base + ${bonusHp}) * ${1 + (bonusPctHp/100)} = ${maxHp.toFixed(2)}</p>
+        <p><strong>Max Stamina:</strong> (${baseStamina.toFixed(2)} Base + ${bonusStam}) * ${1 + (bonusPctStam/100)} = ${maxStamina.toFixed(2)}</p>
+        <p><strong>Max Mana:</strong> (${baseMana.toFixed(2)} Base + ${bonusManaVal}) * ${1 + (bonusPctMana/100)} = ${maxMana.toFixed(2)}</p>
         <p><strong>Mana Cost:</strong> ${spellBase} * ((100 - ${ctrl}) / 100) = ${manaCost.toFixed(2)}</p>
-        <p><strong>Base Carry Cap:</strong> 50 + (${str} * 5) = ${carryCap}kg</p>
     `;
-
-    autoSave();
 }
 
-/* --- Inventory Logic --- */
-function toggleInventory() {
-    document.getElementById('inventory-sidebar').classList.toggle('open');
+function updateVitalsVisuals(maxHp, maxStam, maxMana) {
+    const curHp = parseFloat(document.getElementById('current-hp').value) || 0;
+    const curStam = parseFloat(document.getElementById('current-stamina').value) || 0;
+    const curMana = parseFloat(document.getElementById('current-mana').value) || 0;
+
+    const hpPct = Math.min(Math.max((curHp / maxHp) * 100, 0), 100);
+    const stamPct = Math.min(Math.max((curStam / maxStam) * 100, 0), 100);
+    const manaPct = Math.min(Math.max((curMana / maxMana) * 100, 0), 100);
+
+    document.getElementById('hp-box').style.setProperty('--hp-pct', `${hpPct}%`);
+    document.getElementById('stamina-box').style.setProperty('--stam-pct', `${stamPct}%`);
+    document.getElementById('mana-box').style.setProperty('--mana-pct', `${manaPct}%`);
 }
 
-function addInventoryItem() {
-    const name = document.getElementById('item-name').value.trim();
-    const weight = parseFloat(document.getElementById('item-weight').value) || 0;
-    const qty = parseInt(document.getElementById('item-qty').value) || 1;
+// In-Page Dice Roller
+function rollDice() {
+    const rollInput = document.getElementById('d20-roll');
+    const btn = document.getElementById('dice-btn');
+    btn.disabled = true;
 
-    if (!name) return showToast("Please enter an item name!");
-
-    const existingItem = currentInventory.find(item => 
-        item.name.toLowerCase() === name.toLowerCase() && item.weight === weight
-    );
-
-    if (existingItem) {
-        existingItem.qty += qty;
-    } else {
-        currentInventory.push({ id: Date.now(), name, weight, qty });
-    }
-    
-    document.getElementById('item-name').value = '';
-    document.getElementById('item-weight').value = '';
-    document.getElementById('item-qty').value = '1';
-    
-    saveInventoryLocally();
-    renderInventory();
-    calculateAll(); 
-}
-
-function incrementItem(id) {
-    const item = currentInventory.find(i => i.id === id);
-    if (item) {
-        item.qty++;
-        saveInventoryLocally();
-        renderInventory();
-        calculateAll();
-    }
-}
-
-function decrementItem(id) {
-    const item = currentInventory.find(i => i.id === id);
-    if (item) {
-        item.qty--;
-        if (item.qty <= 0) {
-            removeInventoryItem(id);
-        } else {
-            saveInventoryLocally();
-            renderInventory();
+    let rolls = 0;
+    const interval = setInterval(() => {
+        rollInput.value = Math.floor(Math.random() * 20) + 1;
+        rolls++;
+        if (rolls > 12) {
+            clearInterval(interval);
+            const finalRoll = Math.floor(Math.random() * 20) + 1;
+            rollInput.value = finalRoll;
+            localStorage.setItem(prefix + 'd20-roll', finalRoll);
+            btn.disabled = false;
             calculateAll();
         }
-    }
+    }, 40);
 }
 
-function removeInventoryItem(id) {
-    currentInventory = currentInventory.filter(item => item.id !== id);
-    saveInventoryLocally();
-    renderInventory();
-    calculateAll(); 
-}
-
-function saveInventoryLocally() {
-    localStorage.setItem('current_inventory', JSON.stringify(currentInventory));
-}
-
-function renderInventory() {
-    const list = document.getElementById('inventory-list');
-    list.innerHTML = '';
-    
-    currentInventory.forEach(item => {
-        const div = document.createElement('div');
-        div.className = 'inv-item';
-        div.innerHTML = `
-            <div class="inv-details">
-                <span class="inv-name">${item.name}</span>
-                <span class="inv-stats">${item.weight}kg x ${item.qty} = ${(item.weight * item.qty).toFixed(1)}kg</span>
-            </div>
-            <div class="inv-actions">
-                <button class="qty-btn" onclick="decrementItem(${item.id})">-</button>
-                <button class="qty-btn" onclick="incrementItem(${item.id})">+</button>
-                <button class="del-item-btn" onclick="removeInventoryItem(${item.id})">✖</button>
-            </div>
-        `;
-        list.appendChild(div);
-    });
-}
-
-/* --- Character Management Logic --- */
-function autoSave() {
-    if (!currentCharacter) return; 
-    
-    const charData = { stats: {}, inventory: currentInventory };
-    document.querySelectorAll('.dashboard input[type="number"]').forEach(input => {
-        charData.stats[input.id] = input.value;
-    });
-
-    let characters = JSON.parse(localStorage.getItem('dnd_characters') || '{}');
-    characters[currentCharacter] = charData;
-    localStorage.setItem('dnd_characters', JSON.stringify(characters));
-}
-
-function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
-
-function showToast(message, isSuccess = false) {
-    const toast = document.getElementById('toast-notification');
-    toast.innerText = message;
-    isSuccess ? toast.classList.add('success') : toast.classList.remove('success');
-    toast.classList.remove('hidden');
-    setTimeout(() => toast.classList.add('hidden'), 3000);
-}
-
-function saveCharacter() {
-    const nameInput = document.getElementById('char-name-input');
-    const name = nameInput.value.trim();
-    if (!name) return showToast("Please enter a character name!");
-
-    currentCharacter = name;
-    autoSave();
-    
-    nameInput.value = '';
-    renderCharacters();
-    showToast(`${name} saved & active!`, true);
-}
-
-function renderCharacters() {
-    const container = document.getElementById('char-cards-container');
-    container.innerHTML = '';
-    const characters = JSON.parse(localStorage.getItem('dnd_characters') || '{}');
-
-    for (const name in characters) {
-        const card = document.createElement('div');
-        card.className = 'char-card';
-        
-        // Safely add the name as text, not HTML
-        const title = document.createElement('h4');
-        title.textContent = name; 
-        
-        const actions = document.createElement('div');
-        actions.className = 'char-actions';
-        
-        // Safely attach the click events without breaking quotes
-        const loadBtn = document.createElement('button');
-        loadBtn.className = 'btn-load';
-        loadBtn.textContent = 'Load';
-        loadBtn.onclick = () => loadCharacter(name); 
-        
-        const delBtn = document.createElement('button');
-        delBtn.className = 'btn-delete';
-        delBtn.textContent = 'Delete';
-        delBtn.onclick = () => deleteCharacter(name); 
-        
-        actions.appendChild(loadBtn);
-        actions.appendChild(delBtn);
-        
-        card.appendChild(title);
-        card.appendChild(actions);
-        container.appendChild(card);
-    }
-}
-
-function loadCharacter(name) {
-    const characters = JSON.parse(localStorage.getItem('dnd_characters') || '{}');
-    if (!characters[name]) return;
-
-    currentCharacter = name; 
-
-    const charData = characters[name].stats ? characters[name].stats : characters[name];
-    
-    for (const id in charData) {
-        const input = document.getElementById(id);
-        if (input) {
-            input.value = charData[id];
-            localStorage.setItem(id, charData[id]); 
-        }
-    }
-    
-    currentInventory = characters[name].inventory || [];
-    saveInventoryLocally();
-    
-    renderInventory();
-    calculateAll();
-    toggleSidebar(); 
-    showToast(`${name} loaded!`, true);
-}
-
-let charToDelete = null;
-function deleteCharacter(name) {
-    charToDelete = name;
-    document.getElementById('delete-modal-text').innerText = `Are you sure you want to delete ${name}?`;
-    document.getElementById('delete-modal').classList.remove('hidden');
-}
-
-function closeModal() {
-    document.getElementById('delete-modal').classList.add('hidden');
-    charToDelete = null;
-}
-
-function confirmDelete() {
-    if (!charToDelete) return;
-    let characters = JSON.parse(localStorage.getItem('dnd_characters') || '{}');
-    delete characters[charToDelete];
-    localStorage.setItem('dnd_characters', JSON.stringify(characters));
-    
-    if (currentCharacter === charToDelete) {
-        currentCharacter = null;
-    }
-    
-    renderCharacters();
-    showToast(`${charToDelete} deleted!`, true);
-    closeModal();
-}
-
-/* --- Long Rest & Data Management --- */
+// Rest Mechanics
 function longRest() {
-    const con = parseFloat(document.getElementById('constitution').value) || 0;
-    const end = parseFloat(document.getElementById('endurance').value) || 0;
-    const manaSup = parseFloat(document.getElementById('mana-supply').value) || 0;
+    const maxHp = parseFloat(document.getElementById('max-hp-display').value) || 100;
+    const maxStam = parseFloat(document.getElementById('max-stamina-display').value) || 100;
+    const maxMana = parseFloat(document.getElementById('max-mana-display').value) || 100;
 
-    const newHp = (100 * ((0.5 * con) + 1)).toFixed(0);
-    const newStamina = (100 * ((0.2 * end) + 1)).toFixed(0);
-    const newMana = (100 * ((0.2 * manaSup) + 1)).toFixed(0);
+    document.getElementById('current-hp').value = maxHp;
+    document.getElementById('current-stamina').value = maxStam;
+    document.getElementById('current-mana').value = maxMana;
 
-    document.getElementById('current-hp').value = newHp;
-    document.getElementById('current-stamina').value = newStamina;
-    document.getElementById('current-mana').value = newMana;
-    
-    localStorage.setItem('current-hp', newHp);
-    localStorage.setItem('current-stamina', newStamina);
-    localStorage.setItem('current-mana', newMana);
-    
+    localStorage.setItem(prefix + 'current-hp', maxHp);
+    localStorage.setItem(prefix + 'current-stamina', maxStam);
+    localStorage.setItem(prefix + 'current-mana', maxMana);
+
     calculateAll();
-    showToast("Fully Rested!", true);
 }
 
-function exportData() {
-    const dataStr = localStorage.getItem('dnd_characters') || '{}';
-    const blob = new Blob([dataStr], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = "rpg_console_save.json";
-    a.click();
-    URL.revokeObjectURL(url);
-    showToast("Data Exported!", true);
-}
-
-function importData(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            const imported = JSON.parse(e.target.result);
-            const current = JSON.parse(localStorage.getItem('dnd_characters') || '{}');
-            localStorage.setItem('dnd_characters', JSON.stringify({ ...current, ...imported }));
-            renderCharacters();
-            showToast("Data Imported!", true);
-        } catch (err) {
-            showToast("Invalid Save File!");
-        }
-    };
-    reader.readAsText(file);
-    event.target.value = ''; 
-}
-/* --- Clear Cache Logic --- */
-function clearCache() {
-    document.getElementById('clear-cache-modal').classList.remove('hidden');
-}
-
-function closeClearCacheModal() {
-    document.getElementById('clear-cache-modal').classList.add('hidden');
-}
-
-function confirmClearCache() {
-    // 1. Save the important data first
-    const savedCharacters = localStorage.getItem('dnd_characters');
-    const savedTheme = localStorage.getItem('theme');
-
-    // 2. Wipe the browser's temporary storage (the current inputs)
-    localStorage.clear();
-
-    // 3. Put the important data back safely
-    if (savedCharacters) localStorage.setItem('dnd_characters', savedCharacters);
-    if (savedTheme) localStorage.setItem('theme', savedTheme);
-
-    // 4. Refresh to show the clean board
-    location.reload(); 
-}
-
-/* --- NEW ANIMATION HELPERS --- */
-const animationRequests = {};
-
-function animateValue(id, newValue, isInt = false, duration = 400) {
-    const obj = document.getElementById(id);
-    if (!obj) return;
-    
-    const start = parseFloat(obj.getAttribute('data-val')) || 0;
-    if (start === newValue) return;
-
-    obj.setAttribute('data-val', newValue);
-    if (animationRequests[id]) cancelAnimationFrame(animationRequests[id]);
-
-    let startTimestamp = null;
-    const step = (timestamp) => {
-        if (!startTimestamp) startTimestamp = timestamp;
-        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-        const ease = 1 - Math.pow(1 - progress, 4); // Smooth deceleration
-        const current = start + (newValue - start) * ease;
-        
-        obj.innerText = isInt ? Math.round(current) : current.toFixed(2);
-        
-        if (progress < 1) animationRequests[id] = requestAnimationFrame(step);
-        else obj.innerText = isInt ? newValue : newValue.toFixed(2);
-    };
-    animationRequests[id] = requestAnimationFrame(step);
-}
-
-function updateBars(maxHp, maxStam, maxMana) {
-    if (maxHp === undefined) {
-        maxHp = 100 * ((0.5 * (parseFloat(document.getElementById('constitution').value) || 0)) + 1);
-        maxStam = 100 * ((0.2 * (parseFloat(document.getElementById('endurance').value) || 0)) + 1);
-        maxMana = 100 * ((0.2 * (parseFloat(document.getElementById('mana-supply').value) || 0)) + 1);
-    }
+function shortRest() {
+    const maxHp = parseFloat(document.getElementById('max-hp-display').value) || 100;
+    const maxStam = parseFloat(document.getElementById('max-stamina-display').value) || 100;
+    const maxMana = parseFloat(document.getElementById('max-mana-display').value) || 100;
 
     const curHp = parseFloat(document.getElementById('current-hp').value) || 0;
     const curStam = parseFloat(document.getElementById('current-stamina').value) || 0;
     const curMana = parseFloat(document.getElementById('current-mana').value) || 0;
 
-    document.getElementById('hp-bar').style.width = Math.min(Math.max((curHp / maxHp) * 100, 0), 100) + '%';
-    document.getElementById('stamina-bar').style.width = Math.min(Math.max((curStam / maxStam) * 100, 0), 100) + '%';
-    document.getElementById('mana-bar').style.width = Math.min(Math.max((curMana / maxMana) * 100, 0), 100) + '%';
+    const newHp = Math.min(maxHp, curHp + Math.floor(maxHp * 0.25));
+    const newStam = Math.min(maxStam, curStam + Math.floor(maxStam * 0.25));
+    const newMana = Math.min(maxMana, curMana + Math.floor(maxMana * 0.25));
+
+    document.getElementById('current-hp').value = newHp;
+    document.getElementById('current-stamina').value = newStam;
+    document.getElementById('current-mana').value = newMana;
+
+    localStorage.setItem(prefix + 'current-hp', newHp);
+    localStorage.setItem(prefix + 'current-stamina', newStam);
+    localStorage.setItem(prefix + 'current-mana', newMana);
+
+    calculateAll();
 }
-// theme selector logic
-function changeTheme() {
-    const theme = document.getElementById('theme-selector').value;
-    document.body.setAttribute('data-theme', theme);
-    localStorage.setItem('selected-theme', theme);
+
+// --- Basic Item Inventory Management ---
+function addInventoryItem(saved = null) {
+    const list = document.getElementById('inventory-list');
+    const div = document.createElement('div');
+    div.className = 'inventory-item';
+    div.innerHTML = `
+        <input type="text" class="inv-name" placeholder="Item Name..." value="${saved ? saved.name : ''}" oninput="saveInventory()">
+        <input type="number" class="inv-qty" placeholder="Qty" value="${saved ? saved.qty : '1'}" oninput="saveInventory()">
+        <button class="small-btn del" onclick="this.parentElement.remove(); saveInventory();">✕</button>
+    `;
+    list.appendChild(div);
+    saveInventory();
 }
+
+function saveInventory() {
+    const items = [];
+    document.querySelectorAll('.inventory-item').forEach(item => {
+        items.push({
+            name: item.querySelector('.inv-name').value,
+            qty: item.querySelector('.inv-qty').value
+        });
+    });
+    localStorage.setItem(prefix + 'inventory', JSON.stringify(items));
+}
+
+function loadInventory() {
+    const list = document.getElementById('inventory-list');
+    list.innerHTML = '';
+    const raw = localStorage.getItem(prefix + 'inventory');
+    if (!raw) return;
+    JSON.parse(raw).forEach(item => addInventoryItem(item));
+}
+
+// --- Inputs Data Hooking ---
+function loadActiveCharacter() {
+    prefix = `dnd_v5_${activeChar}_`;
+    document.querySelectorAll('[data-save="true"]').forEach(input => {
+        const val = localStorage.getItem(prefix + input.id);
+        if (val !== null) input.value = val;
+        input.oninput = () => {
+            localStorage.setItem(prefix + input.id, input.value);
+            if (input.id === 'name') document.getElementById('header-name').textContent = input.value || activeChar;
+            calculateAll();
+        };
+    });
+
+    const savedImage = localStorage.getItem(prefix + 'image');
+    if (savedImage) {
+        charImage.src = savedImage;
+        charImage.style.display = 'block';
+        uploadText.style.display = 'none';
+        clearImgBtn.style.display = 'block';
+    } else {
+        charImage.src = '';
+        charImage.style.display = 'none';
+        uploadText.style.display = 'block';
+        clearImgBtn.style.display = 'none';
+    }
+
+    document.getElementById('header-name').textContent = document.getElementById('name').value || activeChar;
+    loadInventory();
+    calculateAll();
+}
+
+// --- Side Drawer & Revamped Character Management ---
+function toggleCharDrawer() {
+    document.getElementById('char-drawer').classList.toggle('open');
+}
+
+function renderCharList() {
+    const container = document.getElementById('char-list');
+    container.innerHTML = '';
+
+    charList.forEach(name => {
+        const card = document.createElement('div');
+        card.className = `char-card-item ${name === activeChar ? 'active' : ''}`;
+        card.innerHTML = `
+            <div class="char-card-top">
+                <span onclick="switchCharacter('${name}')">${name}</span>
+            </div>
+            <div class="char-item-actions">
+                <button class="small-btn" onclick="openRenamePrompt('${name}')">Rename</button>
+                <button class="small-btn" onclick="exportSingleCharacter('${name}')">Export</button>
+                ${charList.length > 1 ? `<button class="small-btn del" onclick="deleteCharacter('${name}')">Delete</button>` : ''}
+            </div>
+        `;
+        container.appendChild(card);
+    });
+}
+
+function switchCharacter(name) {
+    activeChar = name;
+    localStorage.setItem('dnd_active_char_master', activeChar);
+    loadActiveCharacter();
+    renderCharList();
+    toggleCharDrawer();
+}
+
+function openCreatePrompt() {
+    showDialog({
+        title: "New Character",
+        text: "Enter name for the new profile:",
+        showInput: true,
+        callback: (ok, val) => {
+            if (!ok || !val.trim() || charList.includes(val.trim())) return;
+            const newName = val.trim();
+            charList.push(newName);
+            localStorage.setItem('dnd_char_list_master', JSON.stringify(charList));
+            switchCharacter(newName);
+        }
+    });
+}
+
+function openRenamePrompt(oldName) {
+    showDialog({
+        title: `Rename ${oldName}`,
+        text: "Enter new name:",
+        showInput: true,
+        callback: (ok, val) => {
+            if (!ok || !val.trim() || charList.includes(val.trim())) return;
+            const newName = val.trim();
+            const index = charList.indexOf(oldName);
+            charList[index] = newName;
+            localStorage.setItem('dnd_char_list_master', JSON.stringify(charList));
+
+            // Migrate localStorage entries
+            const oldPfx = `dnd_v5_${oldName}_`;
+            const newPfx = `dnd_v5_${newName}_`;
+            Object.keys(localStorage).forEach(key => {
+                if (key.startsWith(oldPfx)) {
+                    localStorage.setItem(key.replace(oldPfx, newPfx), localStorage.getItem(key));
+                    localStorage.removeItem(key);
+                }
+            });
+
+            if (activeChar === oldName) activeChar = newName;
+            localStorage.setItem('dnd_active_char_master', activeChar);
+            loadActiveCharacter();
+            renderCharList();
+        }
+    });
+}
+
+function deleteCharacter(name) {
+    showDialog({
+        title: "Delete Profile",
+        text: `Permanently delete profile ${name}?`,
+        showInput: false,
+        callback: (ok) => {
+            if (!ok) return;
+            charList = charList.filter(c => c !== name);
+            localStorage.setItem('dnd_char_list_master', JSON.stringify(charList));
+
+            const delPfx = `dnd_v5_${name}_`;
+            Object.keys(localStorage).forEach(key => {
+                if (key.startsWith(delPfx)) localStorage.removeItem(key);
+            });
+
+            if (activeChar === name) activeChar = charList[0];
+            localStorage.setItem('dnd_active_char_master', activeChar);
+            loadActiveCharacter();
+            renderCharList();
+        }
+    });
+}
+
+// Single Character Export
+function exportSingleCharacter(name) {
+    const singleData = {};
+    const targetPfx = `dnd_v5_${name}_`;
+    Object.keys(localStorage).forEach(key => {
+        if (key.startsWith(targetPfx)) singleData[key] = localStorage.getItem(key);
+    });
+
+    const blob = new Blob([JSON.stringify({ name, data: singleData }, null, 2)], { type: "application/json" });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `${name}_character.json`;
+    a.click();
+}
+
+// Single Character Import
+function importSingleCharacter(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const parsed = JSON.parse(e.target.result);
+            if (parsed.name && parsed.data) {
+                if (!charList.includes(parsed.name)) charList.push(parsed.name);
+                localStorage.setItem('dnd_char_list_master', JSON.stringify(charList));
+                Object.keys(parsed.data).forEach(k => localStorage.setItem(k, parsed.data[k]));
+                switchCharacter(parsed.name);
+            }
+        } catch (err) {
+            alert("Invalid Character file.");
+        }
+    };
+    reader.readAsText(file);
+}
+
+// Export All
+function exportAllCharacters() {
+    const allData = { charList, activeChar, store: {} };
+    Object.keys(localStorage).forEach(key => {
+        if (key.startsWith('dnd_v5_')) allData.store[key] = localStorage.getItem(key);
+    });
+
+    const blob = new Blob([JSON.stringify(allData, null, 2)], { type: "application/json" });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `all_characters_backup.json`;
+    a.click();
+}
+
+// --- Theme Logic (7 Specified Themes) ---
+function initTheme() {
+    const saved = localStorage.getItem('dnd_selected_theme') || 'default';
+    setTheme(saved, getThemeLabel(saved));
+}
+function toggleThemeDropdown() {
+    document.getElementById('theme-dropdown').classList.toggle('open');
+}
+function selectTheme(theme, label) {
+    setTheme(theme, label);
+    document.getElementById('theme-dropdown').classList.remove('open');
+}
+function setTheme(theme, label) {
+    document.body.className = theme === 'default' ? '' : `theme-${theme}`;
+    localStorage.setItem('dnd_selected_theme', theme);
+    document.querySelector('#theme-dropdown .theme-toggle').textContent = label;
+}
+function getThemeLabel(theme) {
+    const map = {
+        'default': 'Default Dark',
+        'default-light': 'Default Light',
+        'proxy': 'Proxy Terminal',
+        'playful-earth': 'Playful Earth',
+        'cyber': 'Cyber Futuristic',
+        'hallowed-mist': 'Hallowed Mist',
+        'industrial': 'Industrial Grunge'
+    };
+    return map[theme] || 'Default Dark';
+}
+
+// Tooltips
+function setupTooltips() {
+    const tip = document.createElement('div');
+    tip.className = 'custom-tooltip';
+    document.body.appendChild(tip);
+
+    document.addEventListener('mouseover', e => {
+        const el = e.target.closest('[data-tooltip]');
+        if (el) {
+            tip.textContent = el.getAttribute('data-tooltip');
+            tip.classList.add('show');
+        }
+    });
+    document.addEventListener('mousemove', e => {
+        if (tip.classList.contains('show')) {
+            tip.style.left = e.pageX + 'px';
+            tip.style.top = (e.pageY - 15) + 'px';
+        }
+    });
+    document.addEventListener('mouseout', e => {
+        if (e.target.closest('[data-tooltip]')) tip.classList.remove('show');
+    });
+}
+
+// System Dialog (Replaces prompt/confirm)
+let dialogCb = null;
+function showDialog(opts) {
+    document.getElementById('dialog-title').innerText = opts.title || "Alert";
+    document.getElementById('dialog-text').innerText = opts.text || "";
+    const input = document.getElementById('dialog-input');
+    input.value = "";
+    input.style.display = opts.showInput ? "block" : "none";
+    document.getElementById('custom-dialog').classList.add('show');
+    dialogCb = opts.callback;
+}
+document.getElementById('dialog-confirm-btn').onclick = () => {
+    document.getElementById('custom-dialog').classList.remove('show');
+    if (dialogCb) dialogCb(true, document.getElementById('dialog-input').value);
+};
+document.getElementById('dialog-cancel-btn').onclick = () => {
+    document.getElementById('custom-dialog').classList.remove('show');
+    if (dialogCb) dialogCb(false, null);
+};
