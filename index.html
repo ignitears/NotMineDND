@@ -19,7 +19,7 @@
             <h4>Character Profiles</h4>
             <button class="close-drawer-btn" onclick="toggleCharDrawer()">✕</button>
         </div>
-        
+
         <div id="char-list" class="char-list"></div>
         <button class="action-btn create-btn no-select" onclick="openCreatePrompt()">+ New Character</button>
 
@@ -29,23 +29,36 @@
             <button class="action-btn backup-btn no-select" onclick="exportAllCharacters()">Export All</button>
             <label class="action-btn backup-btn import-label no-select">
                 Import Character
-                <input type="file" id="import-single-input" accept=".json" onchange="importSingleCharacter(this)" style="display: none;">
+                <input type="file" id="import-single-input" accept=".json" onchange="importSingleCharacter(this)"
+                    style="display: none;">
             </label>
         </div>
 
         <div class="theme-container">
             <h4 class="no-select">Theme Selection</h4>
+            <!-- Clear Cache Button -->
+            <button class="action-btn" onclick="clearCache()"
+                style="width: 100%; margin-bottom: 10px; background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-main);">
+                🧹 Clear Cache
+            </button>
             <div class="theme-dropdown" id="theme-dropdown">
                 <div class="theme-toggle no-select" onclick="toggleThemeDropdown()">Default Dark</div>
                 <div class="theme-menu">
-                    <div class="theme-item no-select" onclick="selectTheme('default', 'Default Dark')">Default Dark</div>
-                    <div class="theme-item no-select" onclick="selectTheme('default-light', 'Default Light')">Default Light</div>
+                    <div class="theme-item no-select" onclick="selectTheme('default', 'Default Dark')">Default Dark
+                    </div>
+                    <div class="theme-item no-select" onclick="selectTheme('default-light', 'Default Light')">Default
+                        Light</div>
                     <div class="theme-item no-select" onclick="selectTheme('apple', 'Apple Style')">Apple Style</div>
-                    <div class="theme-item no-select" onclick="selectTheme('proxy', 'Proxy Terminal')">Proxy Terminal</div>
-                    <div class="theme-item no-select" onclick="selectTheme('playful-earth', 'Playful Earth')">Playful Earth</div>
-                    <div class="theme-item no-select" onclick="selectTheme('cyber', 'Cyber Futuristic')">Cyber Futuristic</div>
-                    <div class="theme-item no-select" onclick="selectTheme('hallowed-mist', 'Hallowed Mist')">Hallowed Mist</div>
-                    <div class="theme-item no-select" onclick="selectTheme('industrial', 'Industrial Grunge')">Industrial Grunge</div>
+                    <div class="theme-item no-select" onclick="selectTheme('proxy', 'Proxy Terminal')">Proxy Terminal
+                    </div>
+                    <div class="theme-item no-select" onclick="selectTheme('playful-earth', 'Playful Earth')">Playful
+                        Earth</div>
+                    <div class="theme-item no-select" onclick="selectTheme('cyber', 'Cyber Futuristic')">Cyber
+                        Futuristic</div>
+                    <div class="theme-item no-select" onclick="selectTheme('hallowed-mist', 'Hallowed Mist')">Hallowed
+                        Mist</div>
+                    <div class="theme-item no-select" onclick="selectTheme('industrial', 'Industrial Grunge')">
+                        Industrial Grunge</div>
                 </div>
             </div>
         </div>
@@ -61,21 +74,24 @@
                         Lvl <input type="number" id="char-level" class="flash-trigger" data-save="true" value="1">
                     </div>
                 </div>
-                
+
                 <div class="image-wrapper" style="position: relative; margin-bottom: 15px;">
                     <label for="image-input" id="upload-box" class="profile-image-upload no-select">
                         <span id="upload-text">Click to Upload Image</span>
                         <img id="char-image" src="" alt="Character">
                     </label>
                     <input type="file" id="image-input" accept="image/*" style="display: none;">
-                    <button id="clear-img-btn" class="small-btn del no-select" style="display:none; position:absolute; top:10px; right:10px; z-index:10; background:var(--card-bg); padding:6px;" onclick="clearImage(event)">✕</button>
+                    <button id="clear-img-btn" class="small-btn del no-select"
+                        style="display:none; position:absolute; top:10px; right:10px; z-index:10; background:var(--card-bg); padding:6px;"
+                        onclick="clearImage(event)">✕</button>
                 </div>
 
                 <div class="canvas-wrapper" style="display: flex; justify-content: center; margin: 15px 0;">
                     <canvas id="radar-chart" width="460" height="460" style="max-width: 100%;"></canvas>
                 </div>
 
-                <div class="collapsible no-select" onclick="toggleDetails()">Lore & Details <span id="arrow-icon">▼</span></div>
+                <div class="collapsible no-select" onclick="toggleDetails()">Lore & Details <span
+                        id="arrow-icon">▼</span></div>
                 <div id="profile-details">
                     <div class="input-group">
                         <label class="no-select">Name</label><input type="text" id="name" data-save="true">
@@ -84,15 +100,16 @@
                         <label class="no-select">Family</label><input type="text" id="family-name" data-save="true">
                     </div>
                     <div class="input-group">
-                        <label class="no-select">Age</label><input type="number" id="age" class="flash-trigger" data-save="true">
+                        <label class="no-select">Age</label><input type="number" id="age" class="flash-trigger"
+                            data-save="true">
                     </div>
 
                     <label class="textarea-label no-select">Appearance</label>
                     <textarea id="appearance" data-save="true"></textarea>
-                    
+
                     <label class="textarea-label no-select">Personality</label>
                     <textarea id="personality" data-save="true"></textarea>
-                    
+
                     <label class="textarea-label no-select">Backstory</label>
                     <textarea id="backstory" data-save="true"></textarea>
                 </div>
@@ -143,18 +160,22 @@
                             <span class="vital-title" style="color: var(--stamina-color);">STAMINA</span>
                         </div>
                         <div class="split-input">
-                            <input type="number" id="current-stamina" class="flash-trigger" data-save="true" value="100">
+                            <input type="number" id="current-stamina" class="flash-trigger" data-save="true"
+                                value="100">
                             <span class="divider">/</span>
-                            <input type="number" id="max-stamina-display" class="flash-trigger" data-save="true" value="100">
+                            <input type="number" id="max-stamina-display" class="flash-trigger" data-save="true"
+                                value="100">
                         </div>
                         <div class="vital-bonuses">
                             <div class="input-group bonus-group">
                                 <label class="no-select">Bonus Stam</label>
-                                <input type="number" id="bonus-stamina" class="flash-trigger" data-save="true" value="0">
+                                <input type="number" id="bonus-stamina" class="flash-trigger" data-save="true"
+                                    value="0">
                             </div>
                             <div class="input-group bonus-group">
                                 <label class="no-select">Bonus %</label>
-                                <input type="number" id="bonus-pct-stamina" class="flash-trigger" data-save="true" value="0">
+                                <input type="number" id="bonus-pct-stamina" class="flash-trigger" data-save="true"
+                                    value="0">
                             </div>
                         </div>
                         <label class="lock-toggle-btn no-select" id="lbl-lock-stamina">
@@ -171,7 +192,8 @@
                         <div class="split-input">
                             <input type="number" id="current-mana" class="flash-trigger" data-save="true" value="100">
                             <span class="divider">/</span>
-                            <input type="number" id="max-mana-display" class="flash-trigger" data-save="true" value="100">
+                            <input type="number" id="max-mana-display" class="flash-trigger" data-save="true"
+                                value="100">
                         </div>
                         <div class="vital-bonuses">
                             <div class="input-group bonus-group">
@@ -180,7 +202,8 @@
                             </div>
                             <div class="input-group bonus-group">
                                 <label class="no-select">Bonus %</label>
-                                <input type="number" id="bonus-pct-mana" class="flash-trigger" data-save="true" value="0">
+                                <input type="number" id="bonus-pct-mana" class="flash-trigger" data-save="true"
+                                    value="0">
                             </div>
                         </div>
                         <label class="lock-toggle-btn no-select" id="lbl-lock-mana">
@@ -205,66 +228,101 @@
             <!-- Tab 1: Stats -->
             <div id="tab-stats" class="tab-content active stat-grid">
                 <div class="card animate-card">
-                    <div class="card-header no-select"><h3>Physical</h3></div>
-                    <div class="input-group" data-tooltip="Strength: Multiplies base weapon damage and boosts carry capacity.">
-                        <label class="no-select">Strength</label><input type="number" id="strength" class="flash-trigger" data-save="true" value="0">
+                    <div class="card-header no-select">
+                        <h3>Physical</h3>
+                    </div>
+                    <div class="input-group"
+                        data-tooltip="Strength: Multiplies base weapon damage and boosts carry capacity.">
+                        <label class="no-select">Strength</label><input type="number" id="strength"
+                            class="flash-trigger" data-save="true" value="0">
                     </div>
                     <div class="input-group" data-tooltip="Speed: Increases movement distance per turn.">
-                        <label class="no-select">Speed</label><input type="number" id="speed" class="flash-trigger" data-save="true" value="0">
+                        <label class="no-select">Speed</label><input type="number" id="speed" class="flash-trigger"
+                            data-save="true" value="0">
                     </div>
-                    <div class="input-group" data-tooltip="Dexterity: Powers Dodge checks and grants extra action points.">
-                        <label class="no-select">Dexterity</label><input type="number" id="dexterity" class="flash-trigger" data-save="true" value="0">
+                    <div class="input-group"
+                        data-tooltip="Dexterity: Powers Dodge checks and grants extra action points.">
+                        <label class="no-select">Dexterity</label><input type="number" id="dexterity"
+                            class="flash-trigger" data-save="true" value="0">
                     </div>
-                    <div class="input-group" data-tooltip="Quickdraw: Provides flat initiative bonuses in combat encounters.">
-                        <label class="no-select">Quickdraw</label><input type="number" id="quickdraw" class="flash-trigger" data-save="true" value="0">
+                    <div class="input-group"
+                        data-tooltip="Quickdraw: Provides flat initiative bonuses in combat encounters.">
+                        <label class="no-select">Quickdraw</label><input type="number" id="quickdraw"
+                            class="flash-trigger" data-save="true" value="0">
                     </div>
                 </div>
 
                 <div class="card animate-card">
-                    <div class="card-header no-select"><h3>Combat Skills</h3></div>
+                    <div class="card-header no-select">
+                        <h3>Combat Skills</h3>
+                    </div>
                     <div class="input-group" data-tooltip="Endurance: Determines maximum character Stamina.">
-                        <label class="no-select">Endurance</label><input type="number" id="endurance" class="flash-trigger" data-save="true" value="0">
+                        <label class="no-select">Endurance</label><input type="number" id="endurance"
+                            class="flash-trigger" data-save="true" value="0">
                     </div>
-                    <div class="input-group" data-tooltip="Wisdom: Raw skill tracking for insight, mental resilience, and crafting checks.">
-                        <label class="no-select">Wisdom</label><input type="number" id="wisdom" class="flash-trigger" data-save="true" value="0">
+                    <div class="input-group"
+                        data-tooltip="Wisdom: Raw skill tracking for insight, mental resilience, and crafting checks.">
+                        <label class="no-select">Wisdom</label><input type="number" id="wisdom" class="flash-trigger"
+                            data-save="true" value="0">
                     </div>
-                    <div class="input-group" data-tooltip="Adaptation: Raw skill tracking for dynamic environmental adjustments.">
-                        <label class="no-select">Adaptation</label><input type="number" id="adaptation" class="flash-trigger" data-save="true" value="0">
+                    <div class="input-group"
+                        data-tooltip="Adaptation: Raw skill tracking for dynamic environmental adjustments.">
+                        <label class="no-select">Adaptation</label><input type="number" id="adaptation"
+                            class="flash-trigger" data-save="true" value="0">
                     </div>
                     <div class="input-group" data-tooltip="Constitution: Determines maximum character Hit Points (HP).">
-                        <label class="no-select">Constitution</label><input type="number" id="constitution" class="flash-trigger" data-save="true" value="0">
+                        <label class="no-select">Constitution</label><input type="number" id="constitution"
+                            class="flash-trigger" data-save="true" value="0">
                     </div>
                 </div>
 
                 <div class="card animate-card">
-                    <div class="card-header no-select"><h3>Magic Skill</h3></div>
-                    <div class="input-group" data-tooltip="Forecast: Grants extra forecast precision to Hit and Dodge checks.">
-                        <label class="no-select">Forecast</label><input type="number" id="forecast" class="flash-trigger" data-save="true" value="0">
+                    <div class="card-header no-select">
+                        <h3>Magic Skill</h3>
                     </div>
-                    <div class="input-group" data-tooltip="Casting: Scales spell base power into active magical damage.">
-                        <label class="no-select">Casting</label><input type="number" id="casting" class="flash-trigger" data-save="true" value="0">
+                    <div class="input-group"
+                        data-tooltip="Forecast: Grants extra forecast precision to Hit and Dodge checks.">
+                        <label class="no-select">Forecast</label><input type="number" id="forecast"
+                            class="flash-trigger" data-save="true" value="0">
+                    </div>
+                    <div class="input-group"
+                        data-tooltip="Casting: Scales spell base power into active magical damage.">
+                        <label class="no-select">Casting</label><input type="number" id="casting" class="flash-trigger"
+                            data-save="true" value="0">
                     </div>
                     <div class="input-group" data-tooltip="Control: Reduces spell mana expenditure by percentage.">
-                        <label class="no-select">Control</label><input type="number" id="control" class="flash-trigger" data-save="true" value="0">
+                        <label class="no-select">Control</label><input type="number" id="control" class="flash-trigger"
+                            data-save="true" value="0">
                     </div>
-                    <div class="input-group" data-tooltip="Accuracy: Modifies primary accuracy checks for landing attacks.">
-                        <label class="no-select">Accuracy</label><input type="number" id="accuracy" class="flash-trigger" data-save="true" value="0">
+                    <div class="input-group"
+                        data-tooltip="Accuracy: Modifies primary accuracy checks for landing attacks.">
+                        <label class="no-select">Accuracy</label><input type="number" id="accuracy"
+                            class="flash-trigger" data-save="true" value="0">
                     </div>
                 </div>
 
                 <div class="card animate-card">
-                    <div class="card-header no-select"><h3>Intelligence</h3></div>
-                    <div class="input-group" data-tooltip="Analysis: Raw skill tracking for examining systems, clues, and tactics.">
-                        <label class="no-select">Analysis</label><input type="number" id="analysis" class="flash-trigger" data-save="true" value="0">
+                    <div class="card-header no-select">
+                        <h3>Intelligence</h3>
                     </div>
-                    <div class="input-group" data-tooltip="Learning: Raw skill tracking for acquiring techniques and knowledge.">
-                        <label class="no-select">Learning</label><input type="number" id="learning" class="flash-trigger" data-save="true" value="0">
+                    <div class="input-group"
+                        data-tooltip="Analysis: Raw skill tracking for examining systems, clues, and tactics.">
+                        <label class="no-select">Analysis</label><input type="number" id="analysis"
+                            class="flash-trigger" data-save="true" value="0">
                     </div>
-                    <div class="input-group" data-tooltip="Sensing: Determines magical detection and awareness range in meters.">
-                        <label class="no-select">Sensing</label><input type="number" id="sensing" class="flash-trigger" data-save="true" value="0">
+                    <div class="input-group"
+                        data-tooltip="Learning: Raw skill tracking for acquiring techniques and knowledge.">
+                        <label class="no-select">Learning</label><input type="number" id="learning"
+                            class="flash-trigger" data-save="true" value="0">
+                    </div>
+                    <div class="input-group"
+                        data-tooltip="Sensing: Determines magical detection and awareness range in meters.">
+                        <label class="no-select">Sensing</label><input type="number" id="sensing" class="flash-trigger"
+                            data-save="true" value="0">
                     </div>
                     <div class="input-group" data-tooltip="Mana Supply: Increases maximum character Mana reserves.">
-                        <label class="no-select">Mana Supply</label><input type="number" id="mana-supply" class="flash-trigger" data-save="true" value="0">
+                        <label class="no-select">Mana Supply</label><input type="number" id="mana-supply"
+                            class="flash-trigger" data-save="true" value="0">
                     </div>
                 </div>
             </div>
@@ -275,13 +333,15 @@
                     <h3>Dice Roller</h3>
                     <span id="crit-status"></span>
                 </div>
-                
+
                 <div class="dice-section">
                     <button class="giant-dice no-select" id="dice-btn" onclick="rollDice()">🎲</button>
-                    
+
                     <div class="dice-readout no-select">
-                        Modifier: <input type="number" id="d20-mod" data-save="true" value="0" class="inline-calc-input flash-trigger" oninput="calculateAll()"> &nbsp;|&nbsp; 
-                        d20 Roll: <input type="number" id="d20-roll" data-save="true" value="10" min="1" max="20" class="inline-calc-input flash-trigger"> &nbsp;=&nbsp; 
+                        Modifier: <input type="number" id="d20-mod" data-save="true" value="0"
+                            class="inline-calc-input flash-trigger" oninput="calculateAll()"> &nbsp;|&nbsp;
+                        d20 Roll: <input type="number" id="d20-roll" data-save="true" value="10" min="1" max="20"
+                            class="inline-calc-input flash-trigger"> &nbsp;=&nbsp;
                         Total: <span id="display-total" style="user-select: text;">10</span>
                     </div>
                 </div>
@@ -292,37 +352,56 @@
                 <div class="calc-results-grid">
                     <div class="calc-category">
                         <h4 class="no-select">⚔️ Combat & Magic</h4>
-                        <p><strong class="no-select">Physical Damage:</strong> <span id="res-damage" style="user-select: text;">0</span></p>
-                        <p><strong class="no-select">Magic Damage:</strong> <span id="res-magic" style="user-select: text;">0</span></p>
-                        <p><strong class="no-select">Hit Score (Accuracy):</strong> <span id="res-hit" style="user-select: text;">0</span></p>
-                        <p><strong class="no-select">Dodge Score:</strong> <span id="res-dodge" style="user-select: text;">0</span></p>
-                        <p><strong class="no-select">Spell Mana Cost:</strong> <span id="res-cost" style="user-select: text;">0</span></p>
-                        <p><strong class="no-select">Extra Forecast Pts:</strong> <span id="res-forecast" style="user-select: text;">0</span></p>
+                        <p><strong class="no-select">Physical Damage:</strong> <span id="res-damage"
+                                style="user-select: text;">0</span></p>
+                        <p><strong class="no-select">Magic Damage:</strong> <span id="res-magic"
+                                style="user-select: text;">0</span></p>
+                        <p><strong class="no-select">Hit Score (Accuracy):</strong> <span id="res-hit"
+                                style="user-select: text;">0</span></p>
+                        <p><strong class="no-select">Dodge Score:</strong> <span id="res-dodge"
+                                style="user-select: text;">0</span></p>
+                        <p><strong class="no-select">Spell Mana Cost:</strong> <span id="res-cost"
+                                style="user-select: text;">0</span></p>
+                        <p><strong class="no-select">Extra Forecast Pts:</strong> <span id="res-forecast"
+                                style="user-select: text;">0</span></p>
                     </div>
                     <div class="calc-category">
                         <h4 class="no-select">🏃 Utility & Movement</h4>
-                        <p><strong class="no-select">Action Points:</strong> <span id="res-actions" style="user-select: text;">1</span></p>
-                        <p><strong class="no-select">Movement Distance:</strong> <span id="res-distance" style="user-select: text;">0</span>m</p>
-                        <p><strong class="no-select">Initiative Bonus:</strong> +<span id="res-init" style="user-select: text;">0</span></p>
-                        <p><strong class="no-select">Carry Capacity:</strong> <span id="res-carry" style="user-select: text;">50</span>kg</p>
-                        <p><strong class="no-select">Sensing Range:</strong> <span id="res-sense" style="user-select: text;">0</span>m</p>
+                        <p><strong class="no-select">Action Points:</strong> <span id="res-actions"
+                                style="user-select: text;">1</span></p>
+                        <p><strong class="no-select">Movement Distance:</strong> <span id="res-distance"
+                                style="user-select: text;">0</span>m</p>
+                        <p><strong class="no-select">Initiative Bonus:</strong> +<span id="res-init"
+                                style="user-select: text;">0</span></p>
+                        <p><strong class="no-select">Carry Capacity:</strong> <span id="res-carry"
+                                style="user-select: text;">50</span>kg</p>
+                        <p><strong class="no-select">Sensing Range:</strong> <span id="res-sense"
+                                style="user-select: text;">0</span>m</p>
                     </div>
                 </div>
             </div>
 
             <!-- Tab 3: Damage Applier -->
             <div id="tab-dmg-applier" class="tab-content card">
-                <div class="card-header no-select"><h3>Damage Applier Console</h3></div>
-                
+                <div class="card-header no-select">
+                    <h3>Damage Applier Console</h3>
+                </div>
+
                 <div class="applier-grid">
                     <div class="vertical-group">
                         <label class="no-select">Target Vital</label>
                         <div class="custom-dropdown" id="applier-stat-dropdown">
-                            <div class="custom-toggle no-select" onclick="toggleCustomDropdown('applier-stat-dropdown')">Health (HP)</div>
+                            <div class="custom-toggle no-select"
+                                onclick="toggleCustomDropdown('applier-stat-dropdown')">Health (HP)</div>
                             <div class="custom-menu">
-                                <div class="custom-item no-select" onclick="selectCustomOption('applier-stat-dropdown', 'hp', 'Health (HP)')">Health (HP)</div>
-                                <div class="custom-item no-select" onclick="selectCustomOption('applier-stat-dropdown', 'stam', 'Stamina')">Stamina</div>
-                                <div class="custom-item no-select" onclick="selectCustomOption('applier-stat-dropdown', 'mana', 'Mana')">Mana</div>
+                                <div class="custom-item no-select"
+                                    onclick="selectCustomOption('applier-stat-dropdown', 'hp', 'Health (HP)')">Health
+                                    (HP)</div>
+                                <div class="custom-item no-select"
+                                    onclick="selectCustomOption('applier-stat-dropdown', 'stam', 'Stamina')">Stamina
+                                </div>
+                                <div class="custom-item no-select"
+                                    onclick="selectCustomOption('applier-stat-dropdown', 'mana', 'Mana')">Mana</div>
                             </div>
                         </div>
                         <input type="hidden" id="applier-stat" value="hp">
@@ -331,11 +410,18 @@
                     <div class="vertical-group">
                         <label class="no-select">Condition Type</label>
                         <div class="custom-dropdown" id="applier-type-dropdown">
-                            <div class="custom-toggle no-select" onclick="toggleCustomDropdown('applier-type-dropdown')">% of Max</div>
+                            <div class="custom-toggle no-select"
+                                onclick="toggleCustomDropdown('applier-type-dropdown')">% of Max</div>
                             <div class="custom-menu">
-                                <div class="custom-item no-select" onclick="selectCustomOption('applier-type-dropdown', 'max_pct', '% of Max')">% of Max</div>
-                                <div class="custom-item no-select" onclick="selectCustomOption('applier-type-dropdown', 'cur_pct', '% of Current')">% of Current</div>
-                                <div class="custom-item no-select" onclick="selectCustomOption('applier-type-dropdown', 'flat', 'Flat Value')">Flat Value</div>
+                                <div class="custom-item no-select"
+                                    onclick="selectCustomOption('applier-type-dropdown', 'max_pct', '% of Max')">% of
+                                    Max</div>
+                                <div class="custom-item no-select"
+                                    onclick="selectCustomOption('applier-type-dropdown', 'cur_pct', '% of Current')">%
+                                    of Current</div>
+                                <div class="custom-item no-select"
+                                    onclick="selectCustomOption('applier-type-dropdown', 'flat', 'Flat Value')">Flat
+                                    Value</div>
                             </div>
                         </div>
                         <input type="hidden" id="applier-type" value="max_pct">
@@ -347,7 +433,9 @@
                     </div>
                 </div>
 
-                <div class="card-header no-select" style="margin-top: 25px;"><h4 style="color:var(--text-muted);">Target's Current State</h4></div>
+                <div class="card-header no-select" style="margin-top: 25px;">
+                    <h4 style="color:var(--text-muted);">Target's Current State</h4>
+                </div>
                 <div class="applier-grid">
                     <div class="vertical-group">
                         <label class="no-select">Target Max Value</label>
@@ -360,22 +448,32 @@
                 </div>
 
                 <div style="margin-top: 20px; display: flex; justify-content: center;">
-                    <button class="action-btn no-select" style="padding: 12px 25px; font-size: 16px;" onclick="calculateApplier()">Calculate Output</button>
+                    <button class="action-btn no-select" style="padding: 12px 25px; font-size: 16px;"
+                        onclick="calculateApplier()">Calculate Output</button>
                 </div>
 
-                <div class="card-header no-select" style="margin-top: 25px;"><h4 style="color:var(--text-muted);">Result</h4></div>
+                <div class="card-header no-select" style="margin-top: 25px;">
+                    <h4 style="color:var(--text-muted);">Result</h4>
+                </div>
                 <div class="calc-results-grid" style="grid-template-columns: 1fr;">
-                    <div class="calc-category" style="background: var(--card-bg-sub); padding: 15px; border-radius: 8px;">
-                        <p style="font-size: 16px;"><strong class="no-select">Damage to Deal:</strong> <span id="applier-result-dmg" style="color: var(--danger); font-size: 20px; user-select: text;">0</span></p>
-                        <p style="font-size: 16px;"><strong class="no-select">Target Remaining:</strong> <span id="applier-result-cur" style="font-size: 20px; user-select: text;">100</span></p>
+                    <div class="calc-category"
+                        style="background: var(--card-bg-sub); padding: 15px; border-radius: 8px;">
+                        <p style="font-size: 16px;"><strong class="no-select">Damage to Deal:</strong> <span
+                                id="applier-result-dmg"
+                                style="color: var(--danger); font-size: 20px; user-select: text;">0</span></p>
+                        <p style="font-size: 16px;"><strong class="no-select">Target Remaining:</strong> <span
+                                id="applier-result-cur" style="font-size: 20px; user-select: text;">100</span></p>
                     </div>
                 </div>
             </div>
 
             <!-- Tab 4: Weapons Arsenal -->
-            <div id="tab-weapon" class="tab-content" style="background: transparent; border: none; padding: 0; box-shadow: none;">
+            <div id="tab-weapon" class="tab-content"
+                style="background: transparent; border: none; padding: 0; box-shadow: none;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                    <h3 class="no-select" style="color:var(--accent); font-size:1.3em; margin:0; text-transform:uppercase; letter-spacing:0.5px;">Weapons Arsenal</h3>
+                    <h3 class="no-select"
+                        style="color:var(--accent); font-size:1.3em; margin:0; text-transform:uppercase; letter-spacing:0.5px;">
+                        Weapons Arsenal</h3>
                     <button class="action-btn no-select" onclick="addNewWeapon()">+ Add Weapon</button>
                 </div>
                 <div id="weapons-container" class="column"></div>
@@ -401,14 +499,19 @@
 
             <!-- Tab 7: External Webs (Local Shortcuts) -->
             <div id="tab-external" class="tab-content card">
-                <div class="card-header no-select"><h3>External Webs</h3></div>
-                <p style="font-size:13px; color:var(--text-muted); line-height:1.6; margin-bottom:15px;" class="no-select">
-                    Click the button below to select your <code>/local/</code> folder. This will instantly generate direct shortcut buttons to all HTML files stored inside your local folder.
+                <div class="card-header no-select">
+                    <h3>External Webs</h3>
+                </div>
+                <p style="font-size:13px; color:var(--text-muted); line-height:1.6; margin-bottom:15px;"
+                    class="no-select">
+                    Click the button below to select your <code>/local/</code> folder. This will instantly generate
+                    direct shortcut buttons to all HTML files stored inside your local folder.
                 </p>
                 <div style="display: flex; gap: 10px; margin-bottom: 20px;">
                     <label class="action-btn no-select" style="cursor: pointer;">
                         Browse Local Folder
-                        <input type="file" id="folder-picker" webkitdirectory directory multiple style="display: none;" onchange="scanLocalFolder(event)">
+                        <input type="file" id="folder-picker" webkitdirectory directory multiple style="display: none;"
+                            onchange="scanLocalFolder(event)">
                     </label>
                 </div>
                 <div id="external-links-list" class="ability-list"></div>
@@ -416,7 +519,9 @@
 
             <!-- Tab 8: Nerd Tab -->
             <div id="tab-nerd" class="tab-content card">
-                <div class="card-header no-select"><h3>Deep Analytics & DM Check</h3></div>
+                <div class="card-header no-select">
+                    <h3>Deep Analytics & DM Check</h3>
+                </div>
                 <div id="dm-math" class="dm-breakdown-content" style="user-select: text;"></div>
             </div>
         </div>
