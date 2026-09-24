@@ -1153,32 +1153,16 @@ function showDialog(opts) {
     document.getElementById('custom-dialog').classList.add('show');
     dialogCb = opts.callback;
 }
-
 document.getElementById('dialog-confirm-btn').onclick = () => {
     document.getElementById('custom-dialog').classList.remove('show');
     if (dialogCb) dialogCb(true, document.getElementById('dialog-input').value);
 };
-
 document.getElementById('dialog-cancel-btn').onclick = () => {
     document.getElementById('custom-dialog').classList.remove('show');
     if (dialogCb) dialogCb(false, null);
 };
-
+// Adds the '✕' close support for Custom Dialogs if users click off or need a dedicated close target
 document.getElementById('dialog-close-x')?.addEventListener('click', () => {
     document.getElementById('custom-dialog').classList.remove('show');
     if (dialogCb) dialogCb(false, null);
 });
-
-function clearCache() {
-    showDialog({
-        title: "Clear All Data",
-        text: "Are you sure you want to clear all character profiles and local storage? This action cannot be undone.",
-        showInput: false,
-        callback: (ok) => {
-            if (ok) {
-                localStorage.clear();
-                location.reload();
-            }
-        }
-    });
-}
