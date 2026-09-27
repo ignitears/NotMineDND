@@ -693,10 +693,10 @@ function drawRadar(str, spd, dex, qd, end, wis, adapt, con, forc, cast, ctrl, ac
         ctx.restore();
     };
 
-    drawDiamond(110, 110, 80, str, spd, dex, qd, '#ff2a5f', 'Str.', 'Speed', 'Dexterity', 'Quickdraw');
-    drawDiamond(350, 110, 80, end, wis, adapt, con, '#9c27b0', 'Endurance', 'Wisdom', 'Adaptation', 'Con.');
-    drawDiamond(110, 350, 80, forc, cast, ctrl, acc, '#ff9800', 'Forecast', 'Casting', 'Control', 'Accuracy');
-    drawDiamond(350, 350, 80, anal, learn, sens, manaSup, '#84cc16', 'Analysis', 'Learning', 'Sensing', 'Mana Supply');
+    drawDiamond(110, 110, 80, str, spd, con, end, '#ff2a5f', 'Strength', 'Speed', 'Con.', 'Endurance');
+    drawDiamond(350, 110, 80, dex, acc, qd, forc, '#9c27b0', 'Dexterity', 'Accuracy', 'Quickdraw', 'Forecast');
+    drawDiamond(110, 350, 80, learn, anal, adapt, wis, '#ff9800', 'Learning', 'Analysis', 'Adaptation', 'Wisdom');
+    drawDiamond(350, 350, 80, cast, sens, manaSup, ctrl, '#84cc16', 'Casting', 'Sensing', 'Mana Supply', 'Control');
 }
 
 function rollDice() {
