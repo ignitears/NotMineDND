@@ -780,9 +780,15 @@ textarea {
 
 div#tab-stats.active {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 15px;
     margin-top: 15px;
+}
+
+@media (max-width: 700px) {
+    div#tab-stats.active {
+        grid-template-columns: 1fr;
+    }
 }
 
 .equipment-grid {
@@ -1454,4 +1460,872 @@ body.theme-hallowed-mist .giant-dice {
     div#tab-stats.active {
         grid-template-columns: 1fr;
     }
+}
+
+/* ========================================================
+   CRITICAL TEXT (BACKGROUND)
+   ======================================================== */
+.dice-section {
+    position: relative;
+    z-index: 1;
+    min-height: 280px;
+    border-radius: 12px;
+}
+
+/* Single powerful flash instead of double pulse */
+@keyframes critTextFlash {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.9);
+        filter: brightness(1);
+    }
+
+    15% {
+        opacity: 0.9;
+        transform: translate(-50%, -50%) scale(1.15);
+        filter: brightness(1.5);
+        text-shadow: 0 0 50px currentColor;
+    }
+
+    100% {
+        opacity: 0.25;
+        transform: translate(-50%, -50%) scale(1);
+        filter: brightness(1);
+    }
+}
+
+#crit-status {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 300px;
+    /* Gives the text a fixed symmetrical boundary around the 180px dice */
+    transform: translate(-50%, -50%);
+    font-size: clamp(50px, 11vw, 120px);
+    text-align: center;
+    line-height: 0.8;
+    z-index: -1;
+    opacity: 0;
+    pointer-events: none;
+
+    /* Forces perfect vertical symmetry framing the dice */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#crit-status.show-success {
+    color: var(--success);
+    font-family: 'Impact', 'Arial Black', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 5px;
+    text-shadow: 0 0 30px var(--success);
+    animation: critTextFlash 1.2s ease-out forwards;
+}
+
+#crit-status.show-fail {
+    color: var(--danger);
+    font-family: 'Creepster', 'Chiller', 'Nosifer', 'Courier New', monospace;
+    text-transform: uppercase;
+    letter-spacing: -3px;
+    font-weight: bold;
+    text-shadow: 4px 4px 0px #000, -2px -2px 20px var(--danger);
+    animation: critTextFlash 1.2s ease-out forwards;
+}
+
+.giant-dice {
+    position: relative;
+    z-index: 10;
+}
+
+/* ========================================================
+   THEME 1: CYBER FUTURISTIC (CPU DICE)
+   ======================================================== */
+/* Circuit board background for the dice area */
+body.theme-cyber .dice-section {
+    background-image:
+        linear-gradient(rgba(0, 170, 170, 0.15) 2px, transparent 2px),
+        linear-gradient(90deg, rgba(0, 170, 170, 0.15) 2px, transparent 2px);
+    background-size: 30px 30px;
+}
+
+/* Base CPU Chip */
+body.theme-cyber .giant-dice {
+    clip-path: none;
+    border-radius: 6px;
+    background: #111;
+    border: 3px solid #00aaaa;
+    box-shadow: 0 0 20px rgba(0, 170, 170, 0.4);
+    color: #00aaaa;
+}
+
+/* CPU Connector Pins[cite: 12] */
+body.theme-cyber .giant-dice::after {
+    content: "";
+    position: absolute;
+    inset: -14px;
+    z-index: -1;
+    background:
+        repeating-linear-gradient(90deg, transparent, transparent 12px, #00aaaa 12px, #00aaaa 18px) top / 100% 12px no-repeat,
+        repeating-linear-gradient(90deg, transparent, transparent 12px, #00aaaa 12px, #00aaaa 18px) bottom / 100% 12px no-repeat,
+        repeating-linear-gradient(0deg, transparent, transparent 12px, #00aaaa 12px, #00aaaa 18px) left / 12px 100% no-repeat,
+        repeating-linear-gradient(0deg, transparent, transparent 12px, #00aaaa 12px, #00aaaa 18px) right / 12px 100% no-repeat;
+}
+
+/* ========================================================
+   THEME 2: PLAYFUL EARTH (CARTOONY PLANET DICE)
+   ======================================================== */
+body.theme-playful-earth .giant-dice {
+    clip-path: none;
+    border-radius: 50%;
+    /* Make it round */
+    border: 4px solid #fff;
+    background:
+        /* Continents drawn using layered radial gradients */
+        radial-gradient(circle at 20% 40%, #2ed573 18px, transparent 19px),
+        radial-gradient(circle at 75% 25%, #2ed573 14px, transparent 15px),
+        radial-gradient(circle at 60% 85%, #2ed573 24px, transparent 25px),
+        radial-gradient(circle at 85% 65%, #2ed573 16px, transparent 17px),
+        /* Ocean background */
+        radial-gradient(circle at 30% 30%, #4facfe, #00f2fe);
+    box-shadow: inset -15px -15px 25px rgba(0, 0, 0, 0.2), 0 10px 20px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* ========================================================
+   THEME 3: PROXY TERMINAL (CRITICAL FIXES & GLITCH)
+   ======================================================== */
+body.theme-proxy .giant-dice.crit-success-anim {
+    background: var(--success);
+    color: #000;
+    box-shadow: 0 0 50px var(--success), 0 0 100px var(--success), inset 0 0 20px #fff !important;
+    border: 2px solid #fff;
+    transform: scale(1.1);
+}
+
+body.theme-proxy .giant-dice.crit-fail-anim {
+    background: var(--danger);
+    color: #000;
+    box-shadow: 0 0 50px var(--danger), 0 0 100px var(--danger), inset 0 0 20px #fff !important;
+    border: 2px solid #fff;
+    animation: proxyGlitch 0.2s infinite alternate;
+}
+
+@keyframes proxyGlitch {
+    0% {
+        transform: scale(1.15) translate(3px, -3px) skew(3deg);
+    }
+
+    100% {
+        transform: scale(1.15) translate(-3px, 3px) skew(-3deg);
+    }
+}
+
+/* ========================================================
+   GLOBAL BUTTON HOVER & ACTIVE ANIMATIONS
+   ======================================================== */
+
+/* Ensure smooth transitions on all interactive buttons */
+button,
+.action-btn,
+.small-btn,
+.rest-btn,
+.giant-dice {
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.3s, box-shadow 0.3s, background-color 0.3s !important;
+}
+
+/* 1. Cartoony Shrink and Extend (Default Dark, Default Light, Playful Earth) */
+body button:hover,
+body .action-btn:hover,
+body .small-btn:hover,
+body .rest-btn:hover {
+    transform: scale(1.05);
+}
+
+body button:active,
+body .action-btn:active,
+body .small-btn:active,
+body .rest-btn:active {
+    transform: scale(0.92);
+}
+
+/* 2. Brighter (Apple Style, Cyber Futuristic, Industrial Grunge) */
+body.theme-apple button:hover,
+body.theme-apple .action-btn:hover,
+body.theme-apple .small-btn:hover,
+body.theme-apple .rest-btn:hover,
+body.theme-cyber button:hover,
+body.theme-cyber .action-btn:hover,
+body.theme-cyber .small-btn:hover,
+body.theme-cyber .rest-btn:hover,
+body.theme-industrial button:hover,
+body.theme-industrial .action-btn:hover,
+body.theme-industrial .small-btn:hover,
+body.theme-industrial .rest-btn:hover {
+    transform: translateY(-2px);
+    /* Override cartoony scale with a slight lift */
+    filter: brightness(1.35);
+    box-shadow: 0 4px 10px rgba(255, 255, 255, 0.05);
+}
+
+body.theme-cyber button:hover,
+body.theme-cyber .action-btn:hover,
+body.theme-cyber .small-btn:hover,
+body.theme-cyber .rest-btn:hover {
+    filter: brightness(1.6) contrast(1.2);
+    box-shadow: 0 0 15px var(--accent);
+}
+
+body.theme-apple button:active,
+body.theme-apple .action-btn:active,
+body.theme-apple .small-btn:active,
+body.theme-apple .rest-btn:active,
+body.theme-cyber button:active,
+body.theme-cyber .action-btn:active,
+body.theme-cyber .small-btn:active,
+body.theme-cyber .rest-btn:active,
+body.theme-industrial button:active,
+body.theme-industrial .action-btn:active,
+body.theme-industrial .small-btn:active,
+body.theme-industrial .rest-btn:active {
+    transform: translateY(1px);
+    filter: brightness(1);
+    box-shadow: none;
+}
+
+/* 3. Fading & Glowing (Hallowed Mist) */
+body.theme-hallowed-mist button,
+body.theme-hallowed-mist .action-btn,
+body.theme-hallowed-mist .small-btn,
+body.theme-hallowed-mist .rest-btn {
+    transition: all 0.5s ease-in-out !important;
+    /* Slower, ethereal fade */
+}
+
+body.theme-hallowed-mist button:hover,
+body.theme-hallowed-mist .action-btn:hover,
+body.theme-hallowed-mist .small-btn:hover,
+body.theme-hallowed-mist .rest-btn:hover {
+    transform: translateY(-1px);
+    background-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 15px var(--accent), inset 0 0 8px var(--accent);
+    text-shadow: 0 0 5px #fff;
+    border-color: var(--accent);
+}
+
+body.theme-hallowed-mist button:active,
+body.theme-hallowed-mist .action-btn:active,
+body.theme-hallowed-mist .small-btn:active,
+body.theme-hallowed-mist .rest-btn:active {
+    box-shadow: 0 0 5px var(--accent);
+    opacity: 0.6;
+    transform: translateY(0);
+}
+
+/* 4. Glitchy & Comic Playful (Proxy Terminal) */
+@keyframes btnGlitch {
+    0% {
+        transform: translate(0) skew(0deg);
+    }
+
+    25% {
+        transform: translate(-2px, 1px) skew(-2deg);
+    }
+
+    50% {
+        transform: translate(2px, -1px) skew(2deg);
+    }
+
+    75% {
+        transform: translate(-1px, 2px) skew(-1deg);
+    }
+
+    100% {
+        transform: translate(0) skew(0deg);
+    }
+}
+
+body.theme-proxy button:hover,
+body.theme-proxy .action-btn:hover,
+body.theme-proxy .small-btn:hover,
+body.theme-proxy .rest-btn:hover {
+    transform: none;
+    animation: btnGlitch 0.2s infinite;
+    background-color: var(--accent);
+    color: #000;
+    box-shadow: 3px 3px 0px var(--text-main);
+    border-color: #fff;
+}
+
+body.theme-proxy button:active,
+body.theme-proxy .action-btn:active,
+body.theme-proxy .small-btn:active,
+body.theme-proxy .rest-btn:active {
+    animation: none;
+    transform: translate(3px, 3px);
+    box-shadow: 0px 0px 0px var(--text-main);
+}
+
+
+/* ========================================================
+   EXTRA JUICY GIANT DICE ANIMATIONS
+   ======================================================== */
+
+/* ========================================================
+   GLOBAL BUTTON HOVER & ACTIVE ANIMATIONS
+   ======================================================== */
+
+/* Include the missing UI toggles in the smooth transitions */
+button,
+.action-btn,
+.small-btn,
+.rest-btn,
+.giant-dice,
+.collapsible,
+.lock-toggle-btn,
+.theme-toggle,
+.custom-toggle {
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.3s, box-shadow 0.3s, background-color 0.3s !important;
+}
+
+/* 1. Cartoony Shrink and Extend (Default Dark, Default Light, Playful Earth) */
+body button:hover,
+body .action-btn:hover,
+body .small-btn:hover,
+body .rest-btn:hover {
+    transform: scale(1.05);
+}
+
+/* Wide UI elements get a slightly gentler scale to avoid breaking container boundaries */
+body .collapsible:hover,
+body .lock-toggle-btn:hover,
+body .theme-toggle:hover,
+body .custom-toggle:hover {
+    transform: scale(1.02);
+}
+
+body button:active,
+body .action-btn:active,
+body .small-btn:active,
+body .rest-btn:active,
+body .collapsible:active,
+body .lock-toggle-btn:active,
+body .theme-toggle:active,
+body .custom-toggle:active {
+    transform: scale(0.95);
+}
+
+/* 2. Brighter (Apple Style, Cyber Futuristic, Industrial Grunge) */
+body.theme-apple button:hover,
+body.theme-apple .action-btn:hover,
+body.theme-apple .small-btn:hover,
+body.theme-apple .rest-btn:hover,
+body.theme-apple .collapsible:hover,
+body.theme-apple .lock-toggle-btn:hover,
+body.theme-apple .theme-toggle:hover,
+body.theme-apple .custom-toggle:hover,
+body.theme-cyber button:hover,
+body.theme-cyber .action-btn:hover,
+body.theme-cyber .small-btn:hover,
+body.theme-cyber .rest-btn:hover,
+body.theme-cyber .collapsible:hover,
+body.theme-cyber .lock-toggle-btn:hover,
+body.theme-cyber .theme-toggle:hover,
+body.theme-cyber .custom-toggle:hover,
+body.theme-industrial button:hover,
+body.theme-industrial .action-btn:hover,
+body.theme-industrial .small-btn:hover,
+body.theme-industrial .rest-btn:hover,
+body.theme-industrial .collapsible:hover,
+body.theme-industrial .lock-toggle-btn:hover,
+body.theme-industrial .theme-toggle:hover,
+body.theme-industrial .custom-toggle:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.35);
+    box-shadow: 0 4px 10px rgba(255, 255, 255, 0.05);
+}
+
+body.theme-cyber button:hover,
+body.theme-cyber .action-btn:hover,
+body.theme-cyber .small-btn:hover,
+body.theme-cyber .rest-btn:hover,
+body.theme-cyber .collapsible:hover,
+body.theme-cyber .lock-toggle-btn:hover,
+body.theme-cyber .theme-toggle:hover,
+body.theme-cyber .custom-toggle:hover {
+    filter: brightness(1.6) contrast(1.2);
+    box-shadow: 0 0 15px var(--accent);
+}
+
+body.theme-apple button:active,
+body.theme-apple .action-btn:active,
+body.theme-apple .small-btn:active,
+body.theme-apple .rest-btn:active,
+body.theme-apple .collapsible:active,
+body.theme-apple .lock-toggle-btn:active,
+body.theme-apple .theme-toggle:active,
+body.theme-apple .custom-toggle:active,
+body.theme-cyber button:active,
+body.theme-cyber .action-btn:active,
+body.theme-cyber .small-btn:active,
+body.theme-cyber .rest-btn:active,
+body.theme-cyber .collapsible:active,
+body.theme-cyber .lock-toggle-btn:active,
+body.theme-cyber .theme-toggle:active,
+body.theme-cyber .custom-toggle:active,
+body.theme-industrial button:active,
+body.theme-industrial .action-btn:active,
+body.theme-industrial .small-btn:active,
+body.theme-industrial .rest-btn:active,
+body.theme-industrial .collapsible:active,
+body.theme-industrial .lock-toggle-btn:active,
+body.theme-industrial .theme-toggle:active,
+body.theme-industrial .custom-toggle:active {
+    transform: translateY(1px);
+    filter: brightness(1);
+    box-shadow: none;
+}
+
+/* 3. Fading & Glowing (Hallowed Mist) */
+body.theme-hallowed-mist button,
+body.theme-hallowed-mist .action-btn,
+body.theme-hallowed-mist .small-btn,
+body.theme-hallowed-mist .rest-btn,
+body.theme-hallowed-mist .collapsible,
+body.theme-hallowed-mist .lock-toggle-btn,
+body.theme-hallowed-mist .theme-toggle,
+body.theme-hallowed-mist .custom-toggle {
+    transition: all 0.5s ease-in-out !important;
+}
+
+body.theme-hallowed-mist button:hover,
+body.theme-hallowed-mist .action-btn:hover,
+body.theme-hallowed-mist .small-btn:hover,
+body.theme-hallowed-mist .rest-btn:hover,
+body.theme-hallowed-mist .collapsible:hover,
+body.theme-hallowed-mist .lock-toggle-btn:hover,
+body.theme-hallowed-mist .theme-toggle:hover,
+body.theme-hallowed-mist .custom-toggle:hover {
+    transform: translateY(-1px);
+    background-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 15px var(--accent), inset 0 0 8px var(--accent);
+    text-shadow: 0 0 5px #fff;
+    border-color: var(--accent);
+}
+
+body.theme-hallowed-mist button:active,
+body.theme-hallowed-mist .action-btn:active,
+body.theme-hallowed-mist .small-btn:active,
+body.theme-hallowed-mist .rest-btn:active,
+body.theme-hallowed-mist .collapsible:active,
+body.theme-hallowed-mist .lock-toggle-btn:active,
+body.theme-hallowed-mist .theme-toggle:active,
+body.theme-hallowed-mist .custom-toggle:active {
+    box-shadow: 0 0 5px var(--accent);
+    opacity: 0.6;
+    transform: translateY(0);
+}
+
+/* 4. Proxy Terminal - Smooth Shake & Extreme Layer Spreading */
+@keyframes btnGlitchSoft {
+    0% {
+        transform: translate(0) skew(0deg);
+    }
+
+    33% {
+        transform: translate(-0.5px, 0.5px) skew(-0.5deg);
+    }
+
+    66% {
+        transform: translate(0.5px, -0.5px) skew(0.5deg);
+    }
+
+    100% {
+        transform: translate(0) skew(0deg);
+    }
+}
+
+body.theme-proxy button:hover,
+body.theme-proxy .action-btn:hover,
+body.theme-proxy .small-btn:hover,
+body.theme-proxy .rest-btn:hover,
+body.theme-proxy .collapsible:hover,
+body.theme-proxy .lock-toggle-btn:hover,
+body.theme-proxy .theme-toggle:hover,
+body.theme-proxy .custom-toggle:hover {
+    transform: none;
+    animation: btnGlitchSoft 0.3s infinite;
+    background-color: #000;
+    color: var(--accent);
+    border-color: var(--accent);
+    /* 4-way chromatic layer spread */
+    box-shadow:
+        3px 3px 0px var(--danger),
+        -3px -3px 0px var(--mana-color),
+        -3px 3px 0px var(--success),
+        3px -3px 0px var(--accent);
+}
+
+body.theme-proxy button:active,
+body.theme-proxy .action-btn:active,
+body.theme-proxy .small-btn:active,
+body.theme-proxy .rest-btn:active,
+body.theme-proxy .collapsible:active,
+body.theme-proxy .lock-toggle-btn:active,
+body.theme-proxy .theme-toggle:active,
+body.theme-proxy .custom-toggle:active {
+    animation: none;
+    transform: scale(0.98);
+    box-shadow: 0px 0px 0px var(--accent);
+    background-color: var(--accent);
+    color: #000;
+}
+
+
+/* ========================================================
+   EXTRA JUICY GIANT DICE ANIMATIONS
+   ======================================================== */
+
+/* 1. Cartoony (Default Dark, Default Light, Playful Earth) */
+body .giant-dice:hover {
+    transform: scale(1.15) rotate(8deg) translateY(-10px) !important;
+    box-shadow: 0 30px 50px rgba(0, 0, 0, 0.5) !important;
+    border-color: var(--accent) !important;
+}
+
+body .giant-dice:active {
+    transform: scale(0.85) rotate(-5deg) translateY(5px) !important;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3) !important;
+}
+
+body.theme-playful-earth .giant-dice:hover {
+    box-shadow: inset -15px -15px 25px rgba(0, 0, 0, 0.2), 0 25px 45px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* 2. Brighter (Apple Style, Cyber Futuristic, Industrial Grunge) */
+body.theme-apple .giant-dice:hover,
+body.theme-cyber .giant-dice:hover,
+body.theme-industrial .giant-dice:hover {
+    transform: scale(1.08) translateY(-8px) !important;
+}
+
+body.theme-apple .giant-dice:hover {
+    filter: brightness(1.2);
+    box-shadow: 0 20px 40px rgba(0, 122, 255, 0.4) !important;
+    background: rgba(255, 255, 255, 0.9);
+}
+
+body.theme-cyber .giant-dice:hover {
+    filter: brightness(1.6) contrast(1.3);
+    box-shadow: 0 0 60px var(--accent), inset 0 0 30px var(--accent) !important;
+    border-color: #fff !important;
+}
+
+body.theme-industrial .giant-dice:hover {
+    filter: brightness(1.5);
+    background: #2a2a2a;
+    box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.1), 0 15px 30px rgba(0, 0, 0, 0.8) !important;
+    border-color: var(--accent) !important;
+}
+
+/* 3. Fading & Glowing (Hallowed Mist) */
+body.theme-hallowed-mist .giant-dice {
+    transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1) !important;
+}
+
+body.theme-hallowed-mist .giant-dice:hover {
+    transform: scale(1.1) translateY(-5px) !important;
+    box-shadow: 0 0 80px var(--accent), inset 0 0 50px var(--accent) !important;
+    filter: hue-rotate(45deg) brightness(1.3);
+    background: rgba(0, 240, 255, 0.25);
+    border-color: #fff !important;
+}
+
+body.theme-hallowed-mist .giant-dice:active {
+    transform: scale(0.95) !important;
+    filter: hue-rotate(0deg) brightness(0.8);
+    box-shadow: 0 0 20px var(--accent), inset 0 0 10px var(--accent) !important;
+}
+
+/* 4. Proxy Terminal - Clean 2-Layer Pop */
+body.theme-proxy button:hover,
+body.theme-proxy .action-btn:hover,
+body.theme-proxy .small-btn:hover,
+body.theme-proxy .rest-btn:hover,
+body.theme-proxy .collapsible:hover,
+body.theme-proxy .lock-toggle-btn:hover,
+body.theme-proxy .theme-toggle:hover,
+body.theme-proxy .custom-toggle:hover {
+    transform: translate(-3px, -3px);
+    background-color: #000;
+    color: var(--accent);
+    border-color: var(--accent);
+    box-shadow: 6px 6px 0px var(--accent);
+    animation: none;
+}
+
+body.theme-proxy button:active,
+body.theme-proxy .action-btn:active,
+body.theme-proxy .small-btn:active,
+body.theme-proxy .rest-btn:active,
+body.theme-proxy .collapsible:active,
+body.theme-proxy .lock-toggle-btn:active,
+body.theme-proxy .theme-toggle:active,
+body.theme-proxy .custom-toggle:active {
+    transform: translate(3px, 3px);
+    box-shadow: 0px 0px 0px var(--accent);
+    background-color: var(--accent);
+    color: #000;
+    animation: none;
+}
+
+/* 4. Proxy Giant Dice - Clean 2-Layer Pop */
+body.theme-proxy .giant-dice:hover {
+    transform: scale(1.1) translate(-4px, -4px) !important;
+    background: #000;
+    color: var(--accent);
+    border: 2px solid var(--accent) !important;
+    box-shadow: 10px 10px 0px var(--accent) !important;
+    animation: none !important;
+}
+
+body.theme-proxy .giant-dice:active {
+    transform: scale(0.95) translate(4px, 4px) !important;
+    box-shadow: 0 0 0 #000 !important;
+    background: var(--accent);
+    color: #000;
+    animation: none !important;
+}
+
+/* ========================================================
+   DAMAGE APPLIER RESPONSIVE LAYOUT
+   ======================================================== */
+.applier-main-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+}
+
+@media (min-width: 800px) {
+    .applier-main-layout {
+        /* Forces the Preview on the left, Controls on the right */
+        grid-template-columns: 1.1fr 1fr;
+        align-items: start;
+    }
+}
+
+/* ========================================================
+   INVENTORY & EQUIPMENT LAYOUTS
+   ======================================================== */
+.inventory-section {
+    background: var(--card-bg-sub);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.section-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    border-bottom: 1px dashed var(--border-color);
+    padding-bottom: 8px;
+}
+
+.section-title h4 {
+    color: var(--accent);
+    text-transform: uppercase;
+    font-size: 13px;
+    margin: 0;
+}
+
+.coin-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+
+.coin-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 8px;
+}
+
+.coin-box label {
+    font-weight: 900;
+    font-size: 14px;
+    margin-bottom: 6px;
+}
+
+.coin-box:nth-child(1) label {
+    color: #e5e4e2;
+    text-shadow: 0 0 5px rgba(229, 228, 226, 0.3);
+}
+
+.coin-box:nth-child(2) label {
+    color: #ffd700;
+    text-shadow: 0 0 5px rgba(255, 215, 0, 0.3);
+}
+
+.coin-box:nth-child(3) label {
+    color: #c0c0c0;
+    text-shadow: 0 0 5px rgba(192, 192, 192, 0.3);
+}
+
+.coin-box:nth-child(4) label {
+    color: #b87333;
+    text-shadow: 0 0 5px rgba(184, 115, 51, 0.3);
+}
+
+.coin-box input {
+    width: 100%;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.transaction-panel {
+    gap: 10px;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid var(--border-color);
+    animation: tabFadeSlide 0.2s ease-out;
+}
+
+.transaction-panel input,
+.transaction-panel select {
+    flex: 1;
+    font-size: 14px;
+}
+
+.equip-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.equip-grid .input-group {
+    flex-direction: column;
+    align-items: stretch;
+    margin-bottom: 0;
+}
+
+.equip-grid label {
+    margin-bottom: 6px;
+}
+
+@media (max-width: 600px) {
+    .equip-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .transaction-panel {
+        flex-wrap: wrap;
+    }
+
+    .transaction-panel button {
+        flex: 1;
+    }
+}
+
+/* ========================================================
+   INVENTORY TAGS & SEARCH SYSTEM
+   ======================================================== */
+#inv-tags-panel {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
+}
+
+#inv-tags-panel.open {
+    max-height: 250px;
+    opacity: 1;
+    margin-top: 10px;
+    overflow-y: auto;
+}
+
+#inv-tags-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px;
+    background: var(--card-bg-sub);
+    border: 1px dashed var(--border-color);
+    border-radius: 6px;
+}
+
+.filter-tag {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: bold;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: 0.2s;
+}
+
+.filter-tag:hover {
+    border-color: var(--accent);
+    color: var(--text-main);
+}
+
+.filter-tag.active {
+    background: var(--accent);
+    color: #000;
+    border-color: var(--accent);
+}
+
+.item-tag {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    margin-right: 6px;
+    margin-top: 8px;
+    font-weight: bold;
+}
+
+.item-tag .del-tag {
+    cursor: pointer;
+    margin-left: 6px;
+    color: var(--danger);
+    font-size: 10px;
+}
+
+/* ========================================================
+   PREVENT TEXT SELECTION ON SPECIFIC UI ELEMENTS
+   ======================================================== */
+.collapsible,
+.dice-readout,
+#display-total,
+.theme-container h4,
+.applier-preview-col p,
+.applier-preview-col span,
+.no-select {
+    user-select: none !important;
+    -webkit-user-select: none !important;
+}
+
+/* Ensure inputs inside these areas can still be clicked/typed in */
+.dice-readout input,
+.applier-preview-col input,
+.no-select input,
+.no-select textarea,
+.no-select select {
+    user-select: auto !important;
+    -webkit-user-select: auto !important;
 }
