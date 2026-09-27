@@ -693,10 +693,17 @@ function drawRadar(str, spd, dex, qd, end, wis, adapt, con, forc, cast, ctrl, ac
         ctx.restore();
     };
 
-    drawDiamond(110, 110, 80, str, spd, con, end, '#ff2a5f', 'Strength', 'Speed', 'Con.', 'Endurance');
-    drawDiamond(350, 110, 80, dex, acc, qd, forc, '#9c27b0', 'Dexterity', 'Accuracy', 'Quickdraw', 'Forecast');
-    drawDiamond(110, 350, 80, learn, anal, adapt, wis, '#ff9800', 'Learning', 'Analysis', 'Adaptation', 'Wisdom');
-    drawDiamond(350, 350, 80, cast, sens, manaSup, ctrl, '#84cc16', 'Casting', 'Sensing', 'Mana Supply', 'Control');
+    // Top-Left: Physical
+    drawDiamond(110, 110, 80, str, spd, end, con, '#ff2a5f', 'Strength', 'Speed', 'Endurance', 'Constitution');
+    
+    // Top-Right: Combat Skill
+    drawDiamond(350, 110, 80, dex, acc, forc, qd, '#9c27b0', 'Dexterity', 'Accuracy', 'Forecast', 'Quickdraw');
+    
+    // Bottom-Left: Intelligence
+    drawDiamond(110, 350, 80, learn, anal, wis, adapt, '#ff9800', 'Learning', 'Analysis', 'Wisdom', 'Adaptation');
+    
+    // Bottom-Right: Magic Skill
+    drawDiamond(350, 350, 80, cast, sens, ctrl, manaSup, '#84cc16', 'Casting', 'Sensing', 'Control', 'Mana Supply');
 }
 
 function rollDice() {
